@@ -1,0 +1,1 @@
+# ScreenJSON JSON Schema
