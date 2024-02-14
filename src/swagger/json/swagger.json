@@ -1,0 +1,10 @@
+{
+    "swagger": "3.1",
+    "info": {
+      "title": "ScreenJSON",
+      "version": "v1"
+    },
+    "paths": {
+
+    }
+}

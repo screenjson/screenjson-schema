@@ -1,0 +1,10 @@
+swagger: "3.1"
+info:
+  title: ScreenJSON
+  description: A data serialisation format for screenplays
+  version: 1.0.0
+host: api.screenjson.com
+basePath: /v1
+schemes:
+  - https
+paths:

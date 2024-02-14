@@ -1,0 +1,134 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://screenjson.com/schema.json",
+    "title": "ScreenJSON",
+    "description": "A data serialisation format for screenplays.",
+    "type": "object",
+    "properties": {
+
+        "id": {
+            "description": "A unique identifier for the global document.",
+            "type": "string",
+            "format": "uuid"
+        },
+        "guid": {
+            "description": "The ISO format of identifiers used in the document (rfc4122).",
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 10,
+            "default": "rfc4122"
+        },
+        "title": {
+            "description": "Name of the section in the file's main language.",
+            "type": "object",
+            "properties": {
+                "^.*$": {
+                    "type": "string",
+                    "description": "Name or title of the identified part.",
+                    "minLength": 2,
+                    "maxLength": 255
+                }
+            }
+        },
+        "lang": {
+            "description": "ISO country identifier for the main language of the file (en).",
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "default": "en",
+            "examples": ["en", "fr", "es"]
+        },
+        "locale": {
+            "description": "ISO identifier for the environment used to create the document (en-GB).",
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 5,
+            "default": "en_US"
+        },
+        "charset": {
+            "description": "Character set the content was created in (e.g. utf8)",
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 10,
+            "default": "utf8"
+        },
+        "dir": {
+            "description": "Language direction (ltr/rtl)",
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "default": "ltr",
+            "enum": ["ltr", "rtl"]
+        },
+        "authors": {
+            "description": "One or more Author objects.",
+            "type": "array",
+            "items": {
+                "type": "object"
+            },
+            "uniqueItems": true
+        },
+        "colors": {
+            "description": "One or more Color objects (for all content).",
+            "type": "array",
+            "items": {
+                "type": "object"
+            },
+            "uniqueItems": true
+        },
+        "contributors": {
+            "description": "One or more Contributor objects.",
+            "type": "array",
+            "items": {
+                "type": "object"
+            },
+            "uniqueItems": true
+        },
+        "derivations": {
+            "description": "One or more Derivation objects.",
+            "type": "array",
+            "items": {
+                "type": "object"
+            },
+            "uniqueItems": true
+        },
+        "document": {
+            "description": "A Document object with the content of the screenplay.",
+            "type": "object"
+        },
+        "encryption": {
+            "description": "An Encryption object describing the cryto protocol.",
+            "type": ["object", "null"]
+        },
+        "license": {
+            "description": "A License object specifying the copyright.",
+            "type": ["object", "null"]
+        },
+        "registrations": {
+            "description": "One or more Registration objects.",
+            "type": "array",
+            "items": {
+                "type": "object"
+            },
+            "uniqueItems": true
+        },
+        "revisions": {
+            "description": "A list of Revision objects.",
+            "type": "array",
+            "items": {
+                "type": "object"
+            },
+            "uniqueItems": true
+        },
+        "taggable": {
+            "description": "Master index of all slug-formatted keywords in the entire document.",
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "uniqueItems": true
+        }
+    },
+    "required": [ "id", "guid", "title", "lang", "locale", "charset", "dir", "authors", "colors", "contributors", "derivations", "document", "encryption", "license", "registrations", "revisions", "taggable"]
+}
+    
