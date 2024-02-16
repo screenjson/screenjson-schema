@@ -252,6 +252,30 @@
             },
             "required": []
         },
+        "registration": {
+            "description": "",
+            "type": ["object", "null"],
+            "properties": {
+                "authority": {
+                    "description": "Sluggable label of registration provider/host.",
+                    "type": "string",
+                    "pattern": "/^[a-z0-9]+(?:-[a-z0-9]+)*$/",
+                    "minLength": 3,
+                    "maxLength": 50,
+                    "examples": ["WGA-W", "WGA-E"]
+                },
+                "identifier": {
+                    "description": "Sluggable label of registration ID.",
+                    "type": "string",
+                    "pattern": "/^[a-z0-9]+(?:-[a-z0-9]+)*$/",
+                    "minLength": 3,
+                    "maxLength": 50
+                },
+                "created" : { "$ref": "#/$defs/isodate" },
+                "modified" : { "$ref": "#/$defs/isodate" },
+                "meta" : { "$ref": "#/$defs/meta" }
+            }
+        },
         "revision": {
             "description": "When a parent container or sub-section of content was changed.",
             "type": ["object", "null"],
