@@ -1,0 +1,2256 @@
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: https://screenjson.com/schema.json
+title: ScreenJSON
+description: A data serialisation format for screenplays.
+type: object
+$defs:
+  annotation:
+    description: A metadata item which describes an ancillary note made on an object.
+    type:
+      - object
+      - 'null'
+    properties:
+      id:
+        $ref: '#/$defs/id'
+      parent:
+        $ref: '#/$defs/id'
+      highlight:
+        description: String character sequences to visually highlight (first/last chars).
+        type: array
+        items:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+          minItems: 0
+          maxItems: 2
+          uniqueItems: true
+      contributor:
+        $ref: '#/$defs/id'
+      created:
+        $ref: '#/$defs/isodate'
+      content:
+        $ref: '#/$defs/content'
+      color:
+        description: Label of a Color object specifying what colour to display.
+        type: string
+        pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+        minLength: 3
+        maxLength: 15
+      meta:
+        $ref: '#/$defs/meta'
+    required:
+      - id
+      - highlight
+      - created
+      - content
+  author:
+    description: An original writer of the content.
+    type:
+      - object
+      - 'null'
+    properties:
+      id:
+        $ref: '#/$defs/id'
+      given:
+        description: First/given name of the author.
+        type: string
+        minLength: 2
+        maxLength: 20
+      family:
+        description: Last/family/surname name of the author.
+        type: string
+        minLength: 2
+        maxLength: 20
+      meta:
+        $ref: '#/$defs/meta'
+    required:
+      - id
+      - given
+      - family
+  bookmark:
+    description: ' A shortcut child Element object within a Scene object.'
+    type:
+      - object
+      - 'null'
+    properties:
+      id:
+        $ref: '#/$defs/id'
+      parent:
+        $ref: '#/$defs/id'
+      scene:
+        description: Index of the Scene element.
+        type: integer
+        minimum: 0
+      type:
+        description: The type property of the scene Element.
+        type:
+          - string
+          - 'null'
+        pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+        enum:
+          - action
+          - character
+          - dialogue
+          - general
+          - parenthetical
+          - shot
+          - transition
+        minLength: 4
+        maxLength: 15
+      element:
+        description: Child Index of the Element object within the scene.
+        type: integer
+        minimum: 0
+      title:
+        $ref: '#/$defs/content'
+      description:
+        $ref: '#/$defs/content'
+    required:
+      - id
+      - scene
+      - type
+      - element
+      - title
+  charset:
+    description: >-
+      Character set the content was created in (e.g. utf8). See:
+      https://www.iana.org/assignments/character-sets/character-sets.xhtml
+    type:
+      - string
+      - 'null'
+    pattern: ^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$
+    minLength: 2
+    maxLength: 10
+    default: utf8
+  color:
+    description: >-
+      A human-understandable description of a color which the end-user’s
+      presentation UI should use in its display in order to reproduce the same
+      (e.g. HTML colour value).
+    type:
+      - object
+      - 'null'
+    properties:
+      title:
+        description: A sluggable, human-understandable name for the color.
+        type:
+          - string
+          - 'null'
+        pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+      rgb:
+        description: RGB reference numbers of the color.
+        type: array
+        items:
+          type: integer
+          minimum: 0
+          maximum: 255
+        minItems: 2
+        maxItems: 2
+      hex:
+        description: Friendly HTML-reference code of the color.
+        type:
+          - string
+          - 'null'
+        pattern: ^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$
+        minLength: 6
+        maxLength: 7
+      meta:
+        $ref: '#/$defs/meta'
+    required:
+      - title
+      - rgb
+      - hex
+  content:
+    description: A generic piece of translatable text keyed by its ISO language code.
+    type:
+      - object
+      - 'null'
+    properties:
+      ^.*$:
+        type:
+          - string
+          - 'null'
+        description: Any arbitrary string of text.
+        minLength: 1
+        maxLength: 2000
+    required: []
+  contributor:
+    description: >-
+      Any third party who has contributed artistically to the content, such as
+      an editor, director, or script doctor.
+    type:
+      - object
+      - 'null'
+    properties:
+      id:
+        $ref: '#/$defs/id'
+      given:
+        description: First/given name of the contributor.
+        type: string
+        minLength: 2
+        maxLength: 25
+      family:
+        description: Last/family/surname name of the contributor.
+        type: string
+        minLength: 2
+        maxLength: 25
+      roles:
+        $ref: '#/$defs/roles'
+      meta:
+        $ref: '#/$defs/meta'
+    required:
+      - id
+      - given
+      - family
+  dir:
+    description: Language direction (ltr/rtl)
+    type:
+      - string
+      - 'null'
+    pattern: ^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$
+    minLength: 3
+    maxLength: 3
+    default: ltr
+    enum:
+      - ltr
+      - rtl
+  encryption:
+    description: An Encryption object describing the cryto protocol.
+    type:
+      - object
+      - 'null'
+    properties:
+      cipher:
+        description: Cipher the content is encrypted with
+        type:
+          - string
+          - 'null'
+        pattern: ^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$
+        default: aes-256-ctr
+        minLength: 3
+        maxLength: 15
+        enum:
+          - CAST-cbc
+          - aes-128-cbc
+          - aes-128-cbc-hmac-sha1
+          - aes-128-cfb
+          - aes-128-cfb1
+          - aes-128-cfb8
+          - aes-128-ctr
+          - aes-128-ecb
+          - aes-128-gcm
+          - aes-128-ofb
+          - aes-128-xts
+          - aes-192-cbc
+          - aes-192-cfb
+          - aes-192-cfb1
+          - aes-192-cfb8
+          - aes-192-ctr
+          - aes-192-ecb
+          - aes-192-gcm
+          - aes-192-ofb
+          - aes-256-cbc
+          - aes-256-cbc-hmac-sha1
+          - aes-256-cfb
+          - aes-256-cfb1
+          - aes-256-cfb8
+          - aes-256-ctr
+          - aes-256-ecb
+          - aes-256-gcm
+          - aes-256-ofb
+          - aes-256-xts
+          - aes128
+          - aes192
+          - aes256
+          - bf
+          - bf-cbc
+          - bf-cfb
+          - bf-ecb
+          - bf-ofb
+          - blowfish
+          - camellia-128-cbc
+          - camellia-128-cfb
+          - camellia-128-cfb1
+          - camellia-128-cfb8
+          - camellia-128-ecb
+          - camellia-128-ofb
+          - camellia-192-cbc
+          - camellia-192-cfb
+          - camellia-192-cfb1
+          - camellia-192-cfb8
+          - camellia-192-ecb
+          - camellia-192-ofb
+          - camellia-256-cbc
+          - camellia-256-cfb
+          - camellia-256-cfb1
+          - camellia-256-cfb8
+          - camellia-256-ecb
+          - camellia-256-ofb
+          - camellia128
+          - camellia192
+          - camellia256
+          - cast
+          - cast-cbc
+          - cast5-cbc
+          - cast5-cfb
+          - cast5-ecb
+          - cast5-ofb
+          - des
+          - des-cbc
+          - des-cfb
+          - des-cfb1
+          - des-cfb8
+          - des-ecb
+          - des-ede
+          - des-ede-cbc
+          - des-ede-cfb
+          - des-ede-ofb
+          - des-ede3
+          - des-ede3-cbc
+          - des-ede3-cfb
+          - des-ede3-cfb1
+          - des-ede3-cfb8
+          - des-ede3-ofb
+          - des-ofb
+          - des3
+          - desx
+          - desx-cbc
+          - id-aes128-GCM
+          - id-aes192-GCM
+          - id-aes256-GCM
+          - idea
+          - idea-cbc
+          - idea-cfb
+          - idea-ecb
+          - idea-ofb
+          - rc2
+          - rc2-40-cbc
+          - rc2-64-cbc
+          - rc2-cbc
+          - rc2-cfb
+          - rc2-ecb
+          - rc2-ofb
+          - rc4
+          - rc4-40
+          - rc4-hmac-md5
+          - seed
+          - seed-cbc
+          - seed-cfb
+          - seed-ecb
+          - seed-ofb
+      hash:
+        description: Hash type the content is encrypted with.
+        type:
+          - string
+          - 'null'
+        pattern: ^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$
+        default: sha256
+        minLength: 2
+        maxLength: 15
+        enum:
+          - DSA
+          - DSA-SHA
+          - DSA-SHA1
+          - DSA-SHA1-old
+          - RSA-MD4
+          - RSA-MD5
+          - RSA-MDC2
+          - RSA-RIPEMD160
+          - RSA-SHA
+          - RSA-SHA1
+          - RSA-SHA1-2
+          - RSA-SHA224
+          - RSA-SHA256
+          - RSA-SHA384
+          - RSA-SHA512
+          - dsaEncryption
+          - dsaWithSHA
+          - dsaWithSHA1
+          - dss1
+          - ecdsa-with-SHA1
+          - md4
+          - md4WithRSAEncryption
+          - md5
+          - md5WithRSAEncryption
+          - mdc2
+          - mdc2WithRSA
+          - ripemd
+          - ripemd160
+          - ripemd160WithRSA
+          - rmd160
+          - sha
+          - sha1
+          - sha1WithRSAEncryption
+          - sha224
+          - sha224WithRSAEncryption
+          - sha256
+          - sha256WithRSAEncryption
+          - sha384
+          - sha384WithRSAEncryption
+          - sha512
+          - sha512WithRSAEncryption
+          - shaWithRSAEncryption
+          - ssl2-md5
+          - ssl3-md5
+          - ssl3-sha1
+          - whirlpool
+      encoding:
+        Description: Type of binary encoding used for the output.
+        pattern: ^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$
+        type: string
+        default: hex
+        minLength: 3
+        maxLength: 7
+        enum:
+          - hex
+          - base16
+          - base32
+          - base64
+          - ascii85
+      meta:
+        $ref: '#/$defs/meta'
+    required:
+      - cipher
+      - hash
+      - encoding
+  id:
+    description: A unique identifier for the entity or section.
+    type:
+      - string
+      - 'null'
+    format: uuid
+    minLength: 32
+    maxLength: 32
+  isodate:
+    description: >-
+      ISO 8601 24hr timezone date. See:
+      https://www.iso.org/iso-8601-date-and-time-format.html
+    type:
+      - string
+      - 'null'
+    format: date-time
+    minLength: 4
+    maxLength: 23
+    pattern: >-
+      ^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)((-(\d{2}):(\d{2})|Z)?)$
+  lang:
+    description: >-
+      ISO 639 country identifier for the main language of the  entity or
+      section. See: https://www.iso.org/iso-639-language-code
+    type:
+      - string
+      - 'null'
+    default: en
+    minLength: 2
+    maxLength: 2
+    enum:
+      - ab
+      - aa
+      - af
+      - ak
+      - sq
+      - am
+      - ar
+      - an
+      - hy
+      - as
+      - av
+      - ae
+      - ay
+      - az
+      - bm
+      - ba
+      - eu
+      - be
+      - bn
+      - bh
+      - bi
+      - bs
+      - br
+      - bg
+      - my
+      - ca
+      - km
+      - ch
+      - ce
+      - ny
+      - zh
+      - cu
+      - cv
+      - kw
+      - co
+      - cr
+      - hr
+      - cs
+      - da
+      - dv
+      - nl
+      - dz
+      - en
+      - eo
+      - et
+      - ee
+      - fo
+      - fj
+      - fi
+      - fr
+      - ff
+      - gd
+      - gl
+      - lg
+      - ka
+      - de
+      - ki
+      - el
+      - kl
+      - gn
+      - gu
+      - ht
+      - ha
+      - he
+      - hz
+      - hi
+      - ho
+      - hu
+      - is
+      - io
+      - ig
+      - id
+      - ia
+      - ie
+      - iu
+      - ik
+      - ga
+      - it
+      - ja
+      - jv
+      - kn
+      - kr
+      - ks
+      - kk
+      - rw
+      - kv
+      - kg
+      - ko
+      - kj
+      - ku
+      - ky
+      - lo
+      - la
+      - lv
+      - lb
+      - li
+      - ln
+      - lt
+      - lu
+      - mk
+      - mg
+      - ms
+      - ml
+      - mt
+      - gv
+      - mi
+      - mr
+      - mh
+      - ro
+      - mn
+      - na
+      - nv
+      - nd
+      - ng
+      - ne
+      - se
+      - 'no'
+      - nb
+      - nn
+      - ii
+      - oc
+      - oj
+      - or
+      - om
+      - os
+      - pi
+      - pa
+      - ps
+      - fa
+      - pl
+      - pt
+      - qu
+      - rm
+      - rn
+      - ru
+      - sm
+      - sg
+      - sa
+      - sc
+      - sr
+      - sn
+      - sd
+      - si
+      - sk
+      - sl
+      - so
+      - st
+      - nr
+      - es
+      - su
+      - sw
+      - ss
+      - sv
+      - tl
+      - ty
+      - tg
+      - ta
+      - tt
+      - te
+      - th
+      - bo
+      - ti
+      - to
+      - ts
+      - tn
+      - tr
+      - tk
+      - tw
+      - ug
+      - uk
+      - ur
+      - uz
+      - ve
+      - vi
+      - vo
+      - wa
+      - cy
+      - fy
+      - wo
+      - xh
+      - yi
+      - yo
+      - za
+      - zu
+  locale:
+    description: >-
+      ISO identifier for the environment used to create the entity or section
+      (en-GB). See: https://www.w3.org/International/articles/language-tags/
+    type:
+      - string
+      - 'null'
+    pattern: ^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$
+    default: en-US
+    minLength: 5
+    maxLength: 5
+    enum:
+      - af-ZA
+      - am-ET
+      - ar-AE
+      - ar-BH
+      - ar-DZ
+      - ar-EG
+      - ar-IQ
+      - ar-JO
+      - ar-KW
+      - ar-LB
+      - ar-LY
+      - ar-MA
+      - arn-CL
+      - ar-OM
+      - ar-QA
+      - ar-SA
+      - ar-SD
+      - ar-SY
+      - ar-TN
+      - ar-YE
+      - as-IN
+      - az-az
+      - az-Cyrl-AZ
+      - az-Latn-AZ
+      - ba-RU
+      - be-BY
+      - bg-BG
+      - bn-BD
+      - bn-IN
+      - bo-CN
+      - br-FR
+      - bs-Cyrl-BA
+      - bs-Latn-BA
+      - ca-ES
+      - co-FR
+      - cs-CZ
+      - cy-GB
+      - da-DK
+      - de-AT
+      - de-CH
+      - de-DE
+      - de-LI
+      - de-LU
+      - dsb-DE
+      - dv-MV
+      - el-CY
+      - el-GR
+      - en-029
+      - en-AU
+      - en-BZ
+      - en-CA
+      - en-cb
+      - en-GB
+      - en-IE
+      - en-IN
+      - en-JM
+      - en-MT
+      - en-MY
+      - en-NZ
+      - en-PH
+      - en-SG
+      - en-TT
+      - en-US
+      - en-ZA
+      - en-ZW
+      - es-AR
+      - es-BO
+      - es-CL
+      - es-CO
+      - es-CR
+      - es-DO
+      - es-EC
+      - es-ES
+      - es-GT
+      - es-HN
+      - es-MX
+      - es-NI
+      - es-PA
+      - es-PE
+      - es-PR
+      - es-PY
+      - es-SV
+      - es-US
+      - es-UY
+      - es-VE
+      - et-EE
+      - eu-ES
+      - fa-IR
+      - fi-FI
+      - fil-PH
+      - fo-FO
+      - fr-BE
+      - fr-CA
+      - fr-CH
+      - fr-FR
+      - fr-LU
+      - fr-MC
+      - fy-NL
+      - ga-IE
+      - gd-GB
+      - gd-ie
+      - gl-ES
+      - gsw-FR
+      - gu-IN
+      - ha-Latn-NG
+      - he-IL
+      - hi-IN
+      - hr-BA
+      - hr-HR
+      - hsb-DE
+      - hu-HU
+      - hy-AM
+      - id-ID
+      - ig-NG
+      - ii-CN
+      - in-ID
+      - is-IS
+      - it-CH
+      - it-IT
+      - iu-Cans-CA
+      - iu-Latn-CA
+      - iw-IL
+      - ja-JP
+      - ka-GE
+      - kk-KZ
+      - kl-GL
+      - km-KH
+      - kn-IN
+      - kok-IN
+      - ko-KR
+      - ky-KG
+      - lb-LU
+      - lo-LA
+      - lt-LT
+      - lv-LV
+      - mi-NZ
+      - mk-MK
+      - ml-IN
+      - mn-MN
+      - mn-Mong-CN
+      - moh-CA
+      - mr-IN
+      - ms-BN
+      - ms-MY
+      - mt-MT
+      - nb-NO
+      - ne-NP
+      - nl-BE
+      - nl-NL
+      - nn-NO
+      - no-no
+      - nso-ZA
+      - oc-FR
+      - or-IN
+      - pa-IN
+      - pl-PL
+      - prs-AF
+      - ps-AF
+      - pt-BR
+      - pt-PT
+      - qut-GT
+      - quz-BO
+      - quz-EC
+      - quz-PE
+      - rm-CH
+      - ro-mo
+      - ro-RO
+      - ru-mo
+      - ru-RU
+      - rw-RW
+      - sah-RU
+      - sa-IN
+      - se-FI
+      - se-NO
+      - se-SE
+      - si-LK
+      - sk-SK
+      - sl-SI
+      - sma-NO
+      - sma-SE
+      - smj-NO
+      - smj-SE
+      - smn-FI
+      - sms-FI
+      - sq-AL
+      - sr-BA
+      - sr-CS
+      - sr-Cyrl-BA
+      - sr-Cyrl-CS
+      - sr-Cyrl-ME
+      - sr-Cyrl-RS
+      - sr-Latn-BA
+      - sr-Latn-CS
+      - sr-Latn-ME
+      - sr-Latn-RS
+      - sr-ME
+      - sr-RS
+      - sr-sp
+      - sv-FI
+      - sv-SE
+      - sw-KE
+      - syr-SY
+      - ta-IN
+      - te-IN
+      - tg-Cyrl-TJ
+      - th-TH
+      - tk-TM
+      - tlh-QS
+      - tn-ZA
+      - tr-TR
+      - tt-RU
+      - tzm-Latn-DZ
+      - ug-CN
+      - uk-UA
+      - ur-PK
+      - uz-Cyrl-UZ
+      - uz-Latn-UZ
+      - uz-uz
+      - vi-VN
+      - wo-SN
+      - xh-ZA
+      - yo-NG
+      - zh-CN
+      - zh-HK
+      - zh-MO
+      - zh-SG
+      - zh-TW
+      - zu-ZA
+  meta:
+    description: ''
+    type:
+      - object
+      - 'null'
+    properties:
+      ^.*$:
+        type:
+          - string
+          - 'null'
+        description: Key-value pair.
+        minLength: 2
+        maxLength: 255
+    required: []
+  registration:
+    description: ''
+    type:
+      - object
+      - 'null'
+    properties:
+      authority:
+        description: Sluggable label of registration provider/host.
+        type: string
+        pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+        minLength: 3
+        maxLength: 50
+        examples:
+          - WGA-W
+          - WGA-E
+      identifier:
+        description: Sluggable label of registration ID.
+        type: string
+        pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+        minLength: 3
+        maxLength: 50
+      created:
+        $ref: '#/$defs/isodate'
+      modified:
+        $ref: '#/$defs/isodate'
+      meta:
+        $ref: '#/$defs/meta'
+  revision:
+    description: When a parent container or sub-section of content was changed.
+    type:
+      - object
+      - 'null'
+    properties:
+      id:
+        $ref: '#/$defs/id'
+      parent:
+        $ref: '#/$defs/id'
+      index:
+        description: Internal index of the revision.
+        type: integer
+        minimum: 0
+      authors:
+        description: List of author IDs who created the revision.
+        type: array
+        items:
+          $ref: '#/$defs/id'
+      version:
+        description: A slugganle, human-readable type of revision.
+        type:
+          - string
+          - 'null'
+        minLength: 3
+        maxLength: 15
+        pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+        examples:
+          - draft
+          - blue
+          - third
+          - final
+      created:
+        $ref: '#/$defs/isodate'
+      meta:
+        $ref: '#/$defs/meta'
+    required:
+      - id
+      - index
+      - authors
+      - version
+      - created
+  roles:
+    description: >-
+      Sluggable list of system roles/groups a resource belongs to and should be
+      accessible by.
+    type: array
+    items:
+      type:
+        - string
+        - 'null'
+      pattern: ^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$
+      minLength: 3
+      maxLength: 15
+    uniqueItems: true
+  style:
+    description: >-
+      A reusable visual rule a GUI should apply to the content of one or more
+      scene elements throughout the entire document.
+    type:
+      - object
+      - 'null'
+    properties:
+      id:
+        description: Unique sluggable identifier for referencing within the document.
+        type:
+          - string
+          - 'null'
+        pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+        examples:
+          - courier-12
+          - courier-14
+          - courier-16
+          - arial-10
+        minLength: 3
+        maxLength: 25
+      default:
+        description: Whether or not the style should be the default presentation.
+        type: boolean
+      content:
+        description: Arbitrary text with instructions for the presentation rule.
+        type: string
+        minLength: 0
+        maxLength: 1000
+      meta:
+        $ref: '#/$defs/meta'
+    required:
+      - id
+      - default
+      - content
+  template:
+    description: ''
+    type:
+      - object
+      - 'null'
+    properties:
+      id:
+        description: Unique sluggable identifier for referencing within the document.
+        type:
+          - string
+          - 'null'
+        pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+        minLength: 3
+        maxLength: 25
+        examples:
+          - courier-12
+          - courier-14
+          - courier-16
+          - arial-10
+      default:
+        description: Whether or not the style should be the default.
+        type: boolean
+      content:
+        description: Arbitrary text with instructions for the template rule.
+        type: string
+        minLength: 0
+        maxLength: 1000
+      meta:
+        $ref: '#/$defs/meta'
+    required:
+      - id
+      - default
+      - content
+  title:
+    description: Name of the section, specified by it's language code.
+    type:
+      - object
+      - 'null'
+    properties:
+      ^.*$:
+        type:
+          - string
+          - 'null'
+        description: Name or title of the identified part.
+        minLength: 2
+        maxLength: 255
+  uuidarray:
+    description: >-
+      A list of UUID-formatted IDs defined in the document describing unique
+      objects.
+    type: array
+    items:
+      $ref: '#/$defs/id'
+properties:
+  id:
+    $ref: '#/$defs/id'
+  guid:
+    description: >-
+      The ISO format of identifiers used in the document (rfc4122,
+      https://datatracker.ietf.org/doc/html/rfc4122).
+    type:
+      - string
+      - 'null'
+    pattern: ^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$
+    minLength: 2
+    maxLength: 10
+    default: rfc4122
+  title:
+    $ref: '#/$defs/title'
+  lang:
+    $ref: '#/$defs/lang'
+  locale:
+    $ref: '#/$defs/locale'
+  charset:
+    $ref: '#/$defs/charset'
+  dir:
+    $ref: '#/$defs/dir'
+  authors:
+    description: One or more Author objects.
+    type: array
+    items:
+      $ref: '#/$defs/author'
+  colors:
+    description: One or more Color objects (for all content).
+    type: array
+    items:
+      $ref: '#/$defs/color'
+  contributors:
+    description: One or more Contributor objects.
+    type: array
+    items:
+      $ref: '#/$defs/contributor'
+  derivations:
+    description: One or more Derivation objects.
+    type: array
+    items:
+      type:
+        - object
+        - 'null'
+      description: An original artistic work used as a source for the content (based on).
+      properties:
+        id:
+          $ref: '#/$defs/id'
+        type:
+          description: >-
+            A sluggable, human-understandable name for the work's type
+            genre/group.
+          type:
+            - string
+            - 'null'
+          pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+          minLength: 3
+          maxLength: 30
+          examples:
+            - novel
+            - novella
+            - teleplay
+        title:
+          $ref: '#/$defs/content'
+        meta:
+          $ref: '#/$defs/meta'
+      required:
+        - id
+        - type
+        - title
+  document:
+    description: A Document object with the content of the screenplay.
+    type: object
+    properties:
+      bookmarks:
+        description: One or more Bookmark objects.
+        type: array
+        items:
+          $ref: '#/$defs/bookmark'
+      cover:
+        description: How the front page of the screenplay should be presented.
+        type: object
+        properties:
+          title:
+            $ref: '#/$defs/title'
+          authors:
+            $ref: '#/$defs/uuidarray'
+          derivations:
+            $ref: '#/$defs/uuidarray'
+          additional:
+            $ref: '#/$defs/content'
+          meta:
+            $ref: '#/$defs/meta'
+        required:
+          - title
+          - authors
+      header:
+        description: How the footer bar/ribbon of the screenplay should be presented.
+        type: object
+        properties:
+          cover:
+            description: Whether or not to show the header on the cover page.
+            type: boolean
+            default: false
+          display:
+            description: Whether or not to display the header at all.
+            type: boolean
+            default: false
+          start:
+            description: A page or scene index where a header should start to be shown.
+            type: integer
+            minimum: 0
+          omit:
+            description: >-
+              A list of scenes or page indexes where a header should not be
+              shown.
+            type: array
+            items:
+              type: integer
+              minimum: 0
+            uniqueItems: true
+          content:
+            $ref: '#/$defs/content'
+          meta:
+            $ref: '#/$defs/meta'
+        required:
+          - cover
+          - display
+          - start
+          - omit
+          - content
+      footer:
+        description: How the footer bar/ribbon of the screenplay should be presented.
+        type: object
+        properties:
+          cover:
+            description: Whether or not to show the footer on the cover page.
+            type: boolean
+            default: false
+          display:
+            description: Whether or not to display the footer at all.
+            type: boolean
+            default: false
+          start:
+            description: A page or scene index where a footer should start to be shown.
+            type: integer
+            minimum: 0
+          omit:
+            description: >-
+              A list of scenes or page indexes where a footer should not be
+              shown.
+            type: array
+            items:
+              type: integer
+              minimum: 0
+            uniqueItems: true
+          content:
+            $ref: '#/$defs/content'
+          meta:
+            $ref: '#/$defs/meta'
+        required:
+          - cover
+          - display
+          - start
+          - omit
+          - content
+      status:
+        description: A script revision color.
+        type: object
+        properties:
+          color:
+            description: Color code of the revision
+            type: string
+            minLength: 4
+            maxLength: 10
+            enum:
+              - white
+              - blue
+              - pink
+              - yellow
+              - green
+              - goldenrod
+              - buff
+              - salmon
+              - cherry
+          round:
+            description: Which round of revisions the work is on.
+            type: integer
+            minimum: 1
+            default: 1
+          updated:
+            $ref: '#/$defs/isodate'
+          meta:
+            $ref: '#/$defs/meta'
+        required:
+          - color
+          - round
+          - updated
+      scenes:
+        description: A collection of one or more Scene objects.
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              $ref: '#/$defs/id'
+            parent:
+              $ref: '#/$defs/id'
+            authors:
+              $ref: '#/$defs/uuidarray'
+            contributors:
+              $ref: '#/$defs/uuidarray'
+            heading:
+              description: A Heading describes the setting and context of a scene.
+              type: object
+              properties:
+                numbering:
+                  description: Production scene number to display.
+                  type: integer
+                  minimum: 1
+                page:
+                  description: Page number the scene should appear on.
+                  type: integer
+                  minimum: 1
+                context:
+                  description: A Content object specifying INT/EXT/POV etc.
+                  type: object
+                  properties:
+                    ^.*$:
+                      type:
+                        - string
+                        - 'null'
+                      minLength: 3
+                      maxLength: 10
+                      enum:
+                        - I/E
+                        - INT/EXT
+                        - EXT/INT
+                        - INT
+                        - EXT
+                        - POV
+                setting:
+                  description: A Content object specifying the location of the scene.
+                  type: object
+                  properties:
+                    ^.*$:
+                      type: string
+                sequence:
+                  description: A Content object specifying DAY/NIGHT etc.
+                  type: object
+                  properties:
+                    ^.*$:
+                      type:
+                        - string
+                        - 'null'
+                      minLength: 3
+                      maxLength: 15
+                      enum:
+                        - DAY
+                        - NIGHT
+                        - DAWN
+                        - DUSK
+                        - LATER
+                        - MOMENTS LATER
+                        - CONTINUOUS
+                        - MORNING
+                        - AFTERNOON
+                        - EVENING
+                        - THE NEXT DAY
+                description:
+                  $ref: '#/$defs/content'
+                meta:
+                  $ref: '#/$defs/uuidarray'
+              required:
+                - context
+                - setting
+                - sequence
+            body:
+              description: An array of Element objects specifying the scene content.
+              type: array
+              items:
+                description: >-
+                  An Element is a piece of a scene such as dialogue or action,
+                  and analogous to a paragraph in an editing program. It
+                  contains the content of the work.
+                type: object
+                properties:
+                  id:
+                    $ref: '#/$defs/id'
+                  type:
+                    description: >-
+                      The type of element: action, character, dialogue,
+                      parenthetical etc.
+                    type: string
+                    enum:
+                      - action
+                      - character
+                      - dialogue
+                      - general
+                      - parenthetical
+                      - shot
+                      - transition
+                  parent:
+                    $ref: '#/$defs/id'
+                  scene:
+                    $ref: '#/$defs/id'
+                  access:
+                    $ref: '#/$defs/roles'
+                  annotations:
+                    description: One or more Annotation objects.
+                    type: array
+                    items:
+                      $ref: '#/$defs/annotation'
+                  authors:
+                    $ref: '#/$defs/uuidarray'
+                  contributors:
+                    $ref: '#/$defs/uuidarray'
+                  charset:
+                    $ref: '#/$defs/charset'
+                  class:
+                    description: A visual presentation class to apply to the content.
+                    type: string
+                  content:
+                    $ref: '#/$defs/content'
+                  dir:
+                    $ref: '#/$defs/dir'
+                  dom:
+                    description: >-
+                      A comparative reference to a parallel XML/HTML
+                      tag/element.
+                    type: string
+                  dual:
+                    description: Whether or not the element contains dual dialogue.
+                    type: boolean
+                    default: false
+                  encryption:
+                    $ref: '#/$defs/encryption'
+                  fov:
+                    description: >-
+                      The inferred field of view of the camera (e.g. 360
+                      degrees)
+                    type: number
+                    minimum: 0
+                    maximum: 360
+                    default: 40
+                  interactivity:
+                    description: >-
+                      Whether or not the element contains interactive elements
+                      or triggers.
+                    type: boolean
+                    default: false
+                  locked:
+                    description: Whether or not the element is locked for editing/revision.
+                    type: boolean
+                    default: false
+                  meta:
+                    $ref: '#/$defs/meta'
+                  omitted:
+                    description: Whether or not the element should be omitted from display.
+                    type: boolean
+                    default: false
+                  origin:
+                    description: 'Where the dialogue originates: V.O, O.S, O.C, FILTER.'
+                    type: string
+                    enum:
+                      - V.O
+                      - O.S
+                      - O.C
+                      - FILTER
+                  perspective:
+                    description: The inferred visual perspective of the element(e.g. 2D/3D)
+                    type: string
+                    enum:
+                      - 2D
+                      - 3D
+                  revisions:
+                    description: One or more Revisions objects.
+                    type: array
+                    items:
+                      $ref: '#/$defs/revision'
+                  styles:
+                    description: >-
+                      A sluggable list of style identifiers for displaying the
+                      content.
+                    type: array
+                    items:
+                      type: string
+                      pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+                    uniqueItems: true
+                required:
+                  - id
+                  - type
+                  - authors
+                  - content
+            animals:
+              description: Sluggable list of animals present in the scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+            cast:
+              description: Sluggable list of characters present in the scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+            extra:
+              description: >-
+                Sluggable list of additional/miscellaneous items present in the
+                scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+            locations:
+              description: Sluggable list of locations present in the scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+            moods:
+              description: Sluggable list of subjective mood keywords describing the scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+            props:
+              description: Sluggable list of props present in the scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+            sfx:
+              description: Sluggable list of special FX present in the scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+            sounds:
+              description: Sluggable list of sounds, music, and audio present in the scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+            tags:
+              description: Sluggable list of all related keywords attached to the scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+            vfx:
+              description: Sluggable list of visual FX present in the scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+            wardrobe:
+              description: Sluggable list of wardrobe items present in the scene.
+              type: array
+              items:
+                type: string
+                pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+              uniqueItems: true
+          required:
+            - id
+            - authors
+            - contributors
+            - heading
+            - body
+      styles:
+        description: One or more Style objects.
+        type: array
+        items:
+          $ref: '#/$defs/style'
+      templates:
+        description: One or more Template objects.
+        type: array
+        items:
+          $ref: '#/$defs/template'
+      meta:
+        $ref: '#/$defs/meta'
+    required:
+      - bookmarks
+      - cover
+      - header
+      - footer
+      - status
+      - scenes
+      - styles
+  encryption:
+    $ref: '#/$defs/encryption'
+  license:
+    description: A License object specifying the copyright.
+    type:
+      - object
+      - 'null'
+    properties:
+      identifier:
+        description: >-
+          Sluggable label of the copyright schema. E.g.
+          https://spdx.org/licenses/
+        type: string
+        enum:
+          - 0BSD
+          - AAL
+          - Abstyles
+          - AdaCore-doc
+          - Adobe-2006
+          - Adobe-Display-PostScript
+          - Adobe-Glyph
+          - Adobe-Utopia
+          - ADSL
+          - AFL-1.1
+          - AFL-1.2
+          - AFL-2.0
+          - AFL-2.1
+          - AFL-3.0
+          - Afmparse
+          - AGPL-1.0-only
+          - AGPL-1.0-or-later
+          - AGPL-3.0-only
+          - AGPL-3.0-or-later
+          - Aladdin
+          - AMDPLPA
+          - AML
+          - AML-glslang
+          - AMPAS
+          - ANTLR-PD
+          - ANTLR-PD-fallback
+          - Apache-1.0
+          - Apache-1.1
+          - Apache-2.0
+          - APAFML
+          - APL-1.0
+          - App-s2p
+          - APSL-1.0
+          - APSL-1.1
+          - APSL-1.2
+          - APSL-2.0
+          - Arphic-1999
+          - Artistic-1.0
+          - Artistic-1.0-cl8
+          - Artistic-1.0-Perl
+          - Artistic-2.0
+          - ASWF-Digital-Assets-1.0
+          - ASWF-Digital-Assets-1.1
+          - Baekmuk
+          - Bahyph
+          - Barr
+          - bcrypt-Solar-Designer
+          - Beerware
+          - Bitstream-Charter
+          - Bitstream-Vera
+          - BitTorrent-1.0
+          - BitTorrent-1.1
+          - blessing
+          - BlueOak-1.0.0
+          - Boehm-GC
+          - Borceux
+          - Brian-Gladman-2-Clause
+          - Brian-Gladman-3-Clause
+          - BSD-1-Clause
+          - BSD-2-Clause
+          - BSD-2-Clause-Darwin
+          - BSD-2-Clause-Patent
+          - BSD-2-Clause-Views
+          - BSD-3-Clause
+          - BSD-3-Clause-acpica
+          - BSD-3-Clause-Attribution
+          - BSD-3-Clause-Clear
+          - BSD-3-Clause-flex
+          - BSD-3-Clause-HP
+          - BSD-3-Clause-LBNL
+          - BSD-3-Clause-Modification
+          - BSD-3-Clause-No-Military-License
+          - BSD-3-Clause-No-Nuclear-License
+          - BSD-3-Clause-No-Nuclear-License-2014
+          - BSD-3-Clause-No-Nuclear-Warranty
+          - BSD-3-Clause-Open-MPI
+          - BSD-3-Clause-Sun
+          - BSD-4-Clause
+          - BSD-4-Clause-Shortened
+          - BSD-4-Clause-UC
+          - BSD-4.3RENO
+          - BSD-4.3TAHOE
+          - BSD-Advertising-Acknowledgement
+          - BSD-Attribution-HPND-disclaimer
+          - BSD-Inferno-Nettverk
+          - BSD-Protection
+          - BSD-Source-beginning-file
+          - BSD-Source-Code
+          - BSD-Systemics
+          - BSD-Systemics-W3Works
+          - BSL-1.0
+          - BUSL-1.1
+          - bzip2-1.0.6
+          - C-UDA-1.0
+          - CAL-1.0
+          - CAL-1.0-Combined-Work-Exception
+          - Caldera
+          - Caldera-no-preamble
+          - CATOSL-1.1
+          - CC-BY-1.0
+          - CC-BY-2.0
+          - CC-BY-2.5
+          - CC-BY-2.5-AU
+          - CC-BY-3.0
+          - CC-BY-3.0-AT
+          - CC-BY-3.0-AU
+          - CC-BY-3.0-DE
+          - CC-BY-3.0-IGO
+          - CC-BY-3.0-NL
+          - CC-BY-3.0-US
+          - CC-BY-4.0
+          - CC-BY-NC-1.0
+          - CC-BY-NC-2.0
+          - CC-BY-NC-2.5
+          - CC-BY-NC-3.0
+          - CC-BY-NC-3.0-DE
+          - CC-BY-NC-4.0
+          - CC-BY-NC-ND-1.0
+          - CC-BY-NC-ND-2.0
+          - CC-BY-NC-ND-2.5
+          - CC-BY-NC-ND-3.0
+          - CC-BY-NC-ND-3.0-DE
+          - CC-BY-NC-ND-3.0-IGO
+          - CC-BY-NC-ND-4.0
+          - CC-BY-NC-SA-1.0
+          - CC-BY-NC-SA-2.0
+          - CC-BY-NC-SA-2.0-DE
+          - CC-BY-NC-SA-2.0-FR
+          - CC-BY-NC-SA-2.0-UK
+          - CC-BY-NC-SA-2.5
+          - CC-BY-NC-SA-3.0
+          - CC-BY-NC-SA-3.0-DE
+          - CC-BY-NC-SA-3.0-IGO
+          - CC-BY-NC-SA-4.0
+          - CC-BY-ND-1.0
+          - CC-BY-ND-2.0
+          - CC-BY-ND-2.5
+          - CC-BY-ND-3.0
+          - CC-BY-ND-3.0-DE
+          - CC-BY-ND-4.0
+          - CC-BY-SA-1.0
+          - CC-BY-SA-2.0
+          - CC-BY-SA-2.0-UK
+          - CC-BY-SA-2.1-JP
+          - CC-BY-SA-2.5
+          - CC-BY-SA-3.0
+          - CC-BY-SA-3.0-AT
+          - CC-BY-SA-3.0-DE
+          - CC-BY-SA-3.0-IGO
+          - CC-BY-SA-4.0
+          - CC-PDDC
+          - CC0-1.0
+          - CDDL-1.0
+          - CDDL-1.1
+          - CDL-1.0
+          - CDLA-Permissive-1.0
+          - CDLA-Permissive-2.0
+          - CDLA-Sharing-1.0
+          - CECILL-1.0
+          - CECILL-1.1
+          - CECILL-2.0
+          - CECILL-2.1
+          - CECILL-B
+          - CECILL-C
+          - CERN-OHL-1.1
+          - CERN-OHL-1.2
+          - CERN-OHL-P-2.0
+          - CERN-OHL-S-2.0
+          - CERN-OHL-W-2.0
+          - CFITSIO
+          - check-cvs
+          - checkmk
+          - ClArtistic
+          - Clips
+          - CMU-Mach
+          - CMU-Mach-nodoc
+          - CNRI-Jython
+          - CNRI-Python
+          - CNRI-Python-GPL-Compatible
+          - COIL-1.0
+          - Community-Spec-1.0
+          - Condor-1.1
+          - copyleft-next-0.3.0
+          - copyleft-next-0.3.1
+          - Cornell-Lossless-JPEG
+          - CPAL-1.0
+          - CPL-1.0
+          - CPOL-1.02
+          - Cronyx
+          - Crossword
+          - CrystalStacker
+          - CUA-OPL-1.0
+          - Cube
+          - curl
+          - D-FSL-1.0
+          - DEC-3-Clause
+          - diffmark
+          - DL-DE-BY-2.0
+          - DL-DE-ZERO-2.0
+          - DOC
+          - Dotseqn
+          - DRL-1.0
+          - DRL-1.1
+          - DSDP
+          - dtoa
+          - dvipdfm
+          - ECL-1.0
+          - ECL-2.0
+          - EFL-1.0
+          - EFL-2.0
+          - eGenix
+          - Elastic-2.0
+          - Entessa
+          - EPICS
+          - EPL-1.0
+          - EPL-2.0
+          - ErlPL-1.1
+          - etalab-2.0
+          - EUDatagrid
+          - EUPL-1.0
+          - EUPL-1.1
+          - EUPL-1.2
+          - Eurosym
+          - Fair
+          - FBM
+          - FDK-AAC
+          - Ferguson-Twofish
+          - Frameworx-1.0
+          - FreeBSD-DOC
+          - FreeImage
+          - FSFAP
+          - FSFAP-no-warranty-disclaimer
+          - FSFUL
+          - FSFULLR
+          - FSFULLRWD
+          - FTL
+          - Furuseth
+          - fwlw
+          - GCR-docs
+          - GD
+          - GFDL-1.1-invariants-only
+          - GFDL-1.1-invariants-or-later
+          - GFDL-1.1-no-invariants-only
+          - GFDL-1.1-no-invariants-or-later
+          - GFDL-1.1-only
+          - GFDL-1.1-or-later
+          - GFDL-1.2-invariants-only
+          - GFDL-1.2-invariants-or-later
+          - GFDL-1.2-no-invariants-only
+          - GFDL-1.2-no-invariants-or-later
+          - GFDL-1.2-only
+          - GFDL-1.2-or-later
+          - GFDL-1.3-invariants-only
+          - GFDL-1.3-invariants-or-later
+          - GFDL-1.3-no-invariants-only
+          - GFDL-1.3-no-invariants-or-later
+          - GFDL-1.3-only
+          - GFDL-1.3-or-later
+          - Giftware
+          - GL2PS
+          - Glide
+          - Glulxe
+          - GLWTPL
+          - gnuplot
+          - GPL-1.0-only
+          - GPL-1.0-or-later
+          - GPL-2.0-only
+          - GPL-2.0-or-later
+          - GPL-3.0-only
+          - GPL-3.0-or-later
+          - Graphics-Gems
+          - gSOAP-1.3b
+          - gtkbook
+          - HaskellReport
+          - hdparm
+          - Hippocratic-2.1
+          - HP-1986
+          - HP-1989
+          - HPND
+          - HPND-DEC
+          - HPND-doc
+          - HPND-doc-sell
+          - HPND-export-US
+          - HPND-export-US-modify
+          - HPND-Fenneberg-Livingston
+          - HPND-INRIA-IMAG
+          - HPND-Kevlin-Henney
+          - HPND-Markus-Kuhn
+          - HPND-MIT-disclaimer
+          - HPND-Pbmplus
+          - HPND-sell-MIT-disclaimer-xserver
+          - HPND-sell-regexpr
+          - HPND-sell-variant
+          - HPND-sell-variant-MIT-disclaimer
+          - HPND-UC
+          - HTMLTIDY
+          - IBM-pibs
+          - ICU
+          - IEC-Code-Components-EULA
+          - IJG
+          - IJG-short
+          - ImageMagick
+          - iMatix
+          - Imlib2
+          - Info-ZIP
+          - Inner-Net-2.0
+          - Intel
+          - Intel-ACPI
+          - Interbase-1.0
+          - IPA
+          - IPL-1.0
+          - ISC
+          - ISC-Veillard
+          - Jam
+          - JasPer-2.0
+          - JPL-image
+          - JPNIC
+          - JSON
+          - Kastrup
+          - Kazlib
+          - Knuth-CTAN
+          - LAL-1.2
+          - LAL-1.3
+          - Latex2e
+          - Latex2e-translated-notice
+          - Leptonica
+          - LGPL-2.0-only
+          - LGPL-2.0-or-later
+          - LGPL-2.1-only
+          - LGPL-2.1-or-later
+          - LGPL-3.0-only
+          - LGPL-3.0-or-later
+          - LGPLLR
+          - Libpng
+          - libpng-2.0
+          - libselinux-1.0
+          - libtiff
+          - libutil-David-Nugent
+          - LiLiQ-P-1.1
+          - LiLiQ-R-1.1
+          - LiLiQ-Rplus-1.1
+          - Linux-man-pages-1-para
+          - Linux-man-pages-copyleft
+          - Linux-man-pages-copyleft-2-para
+          - Linux-man-pages-copyleft-var
+          - Linux-OpenIB
+          - LOOP
+          - LPD-document
+          - LPL-1.0
+          - LPL-1.02
+          - LPPL-1.0
+          - LPPL-1.1
+          - LPPL-1.2
+          - LPPL-1.3a
+          - LPPL-1.3c
+          - lsof
+          - Lucida-Bitmap-Fonts
+          - LZMA-SDK-9.11-to-9.20
+          - LZMA-SDK-9.22
+          - Mackerras-3-Clause
+          - Mackerras-3-Clause-acknowledgment
+          - magaz
+          - mailprio
+          - MakeIndex
+          - Martin-Birgmeier
+          - McPhee-slideshow
+          - metamail
+          - Minpack
+          - MirOS
+          - MIT
+          - MIT-0
+          - MIT-advertising
+          - MIT-CMU
+          - MIT-enna
+          - MIT-feh
+          - MIT-Festival
+          - MIT-Modern-Variant
+          - MIT-open-group
+          - MIT-testregex
+          - MIT-Wu
+          - MITNFA
+          - MMIXware
+          - Motosoto
+          - MPEG-SSG
+          - mpi-permissive
+          - mpich2
+          - MPL-1.0
+          - MPL-1.1
+          - MPL-2.0
+          - MPL-2.0-no-copyleft-exception
+          - mplus
+          - MS-LPL
+          - MS-PL
+          - MS-RL
+          - MTLL
+          - MulanPSL-1.0
+          - MulanPSL-2.0
+          - Multics
+          - Mup
+          - NAIST-2003
+          - NASA-1.3
+          - Naumen
+          - NBPL-1.0
+          - NCGL-UK-2.0
+          - NCSA
+          - Net-SNMP
+          - NetCDF
+          - Newsletr
+          - NGPL
+          - NICTA-1.0
+          - NIST-PD
+          - NIST-PD-fallback
+          - NIST-Software
+          - NLOD-1.0
+          - NLOD-2.0
+          - NLPL
+          - Nokia
+          - NOSL
+          - Noweb
+          - NPL-1.0
+          - NPL-1.1
+          - NPOSL-3.0
+          - NRL
+          - NTP
+          - NTP-0
+          - O-UDA-1.0
+          - OCCT-PL
+          - OCLC-2.0
+          - ODbL-1.0
+          - ODC-By-1.0
+          - OFFIS
+          - OFL-1.0
+          - OFL-1.0-no-RFN
+          - OFL-1.0-RFN
+          - OFL-1.1
+          - OFL-1.1-no-RFN
+          - OFL-1.1-RFN
+          - OGC-1.0
+          - OGDL-Taiwan-1.0
+          - OGL-Canada-2.0
+          - OGL-UK-1.0
+          - OGL-UK-2.0
+          - OGL-UK-3.0
+          - OGTSL
+          - OLDAP-1.1
+          - OLDAP-1.2
+          - OLDAP-1.3
+          - OLDAP-1.4
+          - OLDAP-2.0
+          - OLDAP-2.0.1
+          - OLDAP-2.1
+          - OLDAP-2.2
+          - OLDAP-2.2.1
+          - OLDAP-2.2.2
+          - OLDAP-2.3
+          - OLDAP-2.4
+          - OLDAP-2.5
+          - OLDAP-2.6
+          - OLDAP-2.7
+          - OLDAP-2.8
+          - OLFL-1.3
+          - OML
+          - OpenPBS-2.3
+          - OpenSSL
+          - OpenSSL-standalone
+          - OpenVision
+          - OPL-1.0
+          - OPL-UK-3.0
+          - OPUBL-1.0
+          - OSET-PL-2.1
+          - OSL-1.0
+          - OSL-1.1
+          - OSL-2.0
+          - OSL-2.1
+          - OSL-3.0
+          - PADL
+          - Parity-6.0.0
+          - Parity-7.0.0
+          - PDDL-1.0
+          - PHP-3.0
+          - PHP-3.01
+          - Pixar
+          - Plexus
+          - pnmstitch
+          - PolyForm-Noncommercial-1.0.0
+          - PolyForm-Small-Business-1.0.0
+          - PostgreSQL
+          - PSF-2.0
+          - psfrag
+          - psutils
+          - Python-2.0
+          - Python-2.0.1
+          - python-ldap
+          - Qhull
+          - QPL-1.0
+          - QPL-1.0-INRIA-2004
+          - radvd
+          - Rdisc
+          - RHeCos-1.1
+          - RPL-1.1
+          - RPL-1.5
+          - RPSL-1.0
+          - RSA-MD
+          - RSCPL
+          - Ruby
+          - SAX-PD
+          - SAX-PD-2.0
+          - Saxpath
+          - SCEA
+          - SchemeReport
+          - Sendmail
+          - Sendmail-8.23
+          - SGI-B-1.0
+          - SGI-B-1.1
+          - SGI-B-2.0
+          - SGI-OpenGL
+          - SGP4
+          - SHL-0.5
+          - SHL-0.51
+          - SimPL-2.0
+          - SISSL
+          - SISSL-1.2
+          - SL
+          - Sleepycat
+          - SMLNJ
+          - SMPPL
+          - SNIA
+          - snprintf
+          - softSurfer
+          - Soundex
+          - Spencer-86
+          - Spencer-94
+          - Spencer-99
+          - SPL-1.0
+          - ssh-keyscan
+          - SSH-OpenSSH
+          - SSH-short
+          - SSLeay-standalone
+          - SSPL-1.0
+          - SugarCRM-1.1.3
+          - Sun-PPP
+          - SunPro
+          - SWL
+          - swrule
+          - Symlinks
+          - TAPR-OHL-1.0
+          - TCL
+          - TCP-wrappers
+          - TermReadKey
+          - TGPPL-1.0
+          - TMate
+          - TORQUE-1.1
+          - TOSL
+          - TPDL
+          - TPL-1.0
+          - TTWL
+          - TTYP0
+          - TU-Berlin-1.0
+          - TU-Berlin-2.0
+          - UCAR
+          - UCL-1.0
+          - ulem
+          - UMich-Merit
+          - Unicode-3.0
+          - Unicode-DFS-2015
+          - Unicode-DFS-2016
+          - Unicode-TOU
+          - UnixCrypt
+          - Unlicense
+          - UPL-1.0
+          - URT-RLE
+          - Vim
+          - VOSTROM
+          - VSL-1.0
+          - W3C
+          - W3C-19980720
+          - W3C-20150513
+          - w3m
+          - Watcom-1.0
+          - Widget-Workshop
+          - Wsuipa
+          - WTFPL
+          - X11
+          - X11-distribute-modifications-variant
+          - Xdebug-1.03
+          - Xerox
+          - Xfig
+          - XFree86-1.1
+          - xinetd
+          - xkeyboard-config-Zinoviev
+          - xlock
+          - Xnet
+          - xpp
+          - XSkat
+          - YPL-1.0
+          - YPL-1.1
+          - Zed
+          - Zeeff
+          - Zend-2.0
+          - Zimbra-1.3
+          - Zimbra-1.4
+          - Zlib
+          - zlib-acknowledgement
+          - ZPL-1.1
+          - ZPL-2.0
+          - ZPL-2.1
+          - Identifier
+          - AGPL-1.0
+          - AGPL-3.0
+          - BSD-2-Clause-FreeBSD
+          - BSD-2-Clause-NetBSD
+          - bzip2-1.0.5
+          - eCos-2.0
+          - GFDL-1.1
+          - GFDL-1.2
+          - GFDL-1.3
+          - GPL-1.0
+          - GPL-1.0+
+          - GPL-2.0
+          - GPL-2.0+
+          - GPL-2.0-with-autoconf-exception
+          - GPL-2.0-with-bison-exception
+          - GPL-2.0-with-classpath-exception
+          - GPL-2.0-with-font-exception
+          - GPL-2.0-with-GCC-exception
+          - GPL-3.0
+          - GPL-3.0+
+          - GPL-3.0-with-autoconf-exception
+          - GPL-3.0-with-GCC-exception
+          - LGPL-2.0
+          - LGPL-2.0+
+          - LGPL-2.1
+          - LGPL-2.1+
+          - LGPL-3.0
+          - LGPL-3.0+
+          - Nunit
+          - StandardML-NJ
+          - wxWindows
+      ref:
+        description: Internet reference for the full definition of the copyright terms.
+        type:
+          - string
+          - 'null'
+        format: uri
+      meta:
+        $ref: '#/$defs/meta'
+    required:
+      - identifier
+      - ref
+  registrations:
+    description: One or more Registration objects.
+    type: array
+    items:
+      $ref: '#/$defs/registration'
+  revisions:
+    description: A list of Revision objects.
+    type: array
+    items:
+      $ref: '#/$defs/revision'
+  taggable:
+    description: Master index of all slug-formatted keywords in the entire document.
+    type: array
+    items:
+      type:
+        - string
+        - 'null'
+      pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+    uniqueItems: true
+required:
+  - id
+  - guid
+  - title
+  - lang
+  - locale
+  - charset
+  - dir
+  - authors
+  - colors
+  - contributors
+  - derivations
+  - document
+  - encryption
+  - license
+  - registrations
+  - revisions
+  - taggable
