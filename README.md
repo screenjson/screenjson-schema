@@ -1,19 +1,3 @@
-Here’s a **drop-in README rewrite** that matches the **new naming** you settled on:
-
-* `format_ref` → `format`
-* “lines” → **elements** (internally: `element` base, `body` contains elements)
-* `rag` → `analysis`
-* `chunk` → `passage`
-* `synopsis` → `summary`
-* embedding fields: `dims/vector/src` → `dimensions/values/source`
-* bookmarks: `line` → `element`
-* **no `beats`** and **no `tone`** (removed)
-* `parenthetical` is the canonical term (no `paren`)
-
-You can paste this whole thing over your README.
-
----
-
 # ScreenJSON Schema
 
 ScreenJSON is a data serialisation format for screenplays. It captures the full structure of a script—scenes, dialogue, action, characters, metadata—in a single JSON document that can be validated, indexed, searched, and rendered by any compliant tool.
