@@ -106,8 +106,8 @@
       "default": []
     },
 
-    "guide": {
-      "description": "Reference to an external screenplay presentation guide (informational for renderers).",
+    "format": {
+      "description": "Reference to an external screenplay presentation standard for renderers (informational only).",
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -193,7 +193,7 @@
         },
         "desc": { "$ref": "#/$defs/text" },
         "traits": {
-          "description": "Searchable attributes (protagonist, villain, comic-relief, etc.).",
+          "description": "Optional descriptive tags for search and filtering (non-canonical, editorial choice).",
           "type": "array",
           "items": { "$ref": "#/$defs/slug" },
           "uniqueItems": true,
@@ -232,7 +232,7 @@
     },
 
     "note": {
-      "description": "An ancillary note attached to an object (typically a line).",
+      "description": "An ancillary note attached to an object (typically an element).",
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -330,18 +330,18 @@
     },
 
     "bookmark": {
-      "description": "A shortcut to a specific line within a scene (stable by IDs).",
+      "description": "A shortcut to a specific element within a scene (stable by ids).",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "id": { "$ref": "#/$defs/uuid" },
         "scene": { "$ref": "#/$defs/uuid" },
-        "line": { "$ref": "#/$defs/uuid" },
+        "element": { "$ref": "#/$defs/uuid" },
         "title": { "$ref": "#/$defs/text" },
         "desc": { "$ref": "#/$defs/text" },
         "meta": { "$ref": "#/$defs/meta" }
       },
-      "required": ["id", "scene", "line", "title"]
+      "required": ["id", "scene", "element", "title"]
     },
 
     "slugline": {
@@ -387,7 +387,7 @@
               ]
             },
             {
-              "pattern": "^[A-Z0-9][A-Z0-9 .''/-]{1,39}$"
+              "pattern": "^[A-Z0-9][A-Z0-9 .’'/-]{1,39}$"
             }
           ]
         },
@@ -404,131 +404,121 @@
       "required": ["context", "setting", "time"]
     },
 
-    "line": {
-      "description": "Common fields for all lines in a scene.",
+    "element": {
+      "description": "Common fields for all elements within a scene body.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "id": { "$ref": "#/$defs/uuid" },
         "scene": { "$ref": "#/$defs/uuid" },
-
-        "access": { "$ref": "#/$defs/roles" },
-
-        "notes": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/note" },
-          "default": []
-        },
-
         "authors": {
           "type": "array",
           "items": { "$ref": "#/$defs/uuid" },
           "minItems": 1
         },
-
         "contributors": {
           "type": "array",
           "items": { "$ref": "#/$defs/uuid" },
           "default": []
         },
-
+        "access": { "$ref": "#/$defs/roles" },
+        "notes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/note" },
+          "default": []
+        },
         "charset": { "$ref": "#/$defs/charset" },
         "dir": { "$ref": "#/$defs/dir" },
-
         "class": { "$ref": "#/$defs/slug" },
         "dom": { "type": "string", "minLength": 0, "maxLength": 100 },
-
         "encrypt": { "$ref": "#/$defs/encrypt" },
-
         "locked": { "type": "boolean", "default": false },
         "omit": { "type": "boolean", "default": false },
-
         "revisions": {
           "type": "array",
           "items": { "$ref": "#/$defs/revision" },
           "default": []
         },
-
         "styles": {
           "type": "array",
           "items": { "$ref": "#/$defs/slug" },
           "uniqueItems": true,
           "default": []
         },
-
         "meta": { "$ref": "#/$defs/meta" }
       },
       "required": ["id", "authors"]
     },
 
-    "line_action": {
+    "action": {
       "allOf": [
-        { "$ref": "#/$defs/line" },
+        { "$ref": "#/$defs/element" },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": { "const": "action" },
             "text": { "$ref": "#/$defs/text" }
           },
-          "required": ["type", "text"],
-          "unevaluatedProperties": false
+          "required": ["type", "text"]
         }
       ]
     },
 
-    "line_shot": {
+    "shot": {
       "allOf": [
-        { "$ref": "#/$defs/line" },
+        { "$ref": "#/$defs/element" },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": { "const": "shot" },
             "text": { "$ref": "#/$defs/text" },
             "fov": { "type": "number", "minimum": 0, "maximum": 360, "default": 40 },
             "perspective": { "type": "string", "enum": ["2D", "3D"], "default": "2D" }
           },
-          "required": ["type", "text"],
-          "unevaluatedProperties": false
+          "required": ["type", "text"]
         }
       ]
     },
 
-    "line_transition": {
+    "transition": {
       "allOf": [
-        { "$ref": "#/$defs/line" },
+        { "$ref": "#/$defs/element" },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": { "const": "transition" },
             "text": { "$ref": "#/$defs/text" }
           },
-          "required": ["type", "text"],
-          "unevaluatedProperties": false
+          "required": ["type", "text"]
         }
       ]
     },
 
-    "line_general": {
+    "general": {
       "allOf": [
-        { "$ref": "#/$defs/line" },
+        { "$ref": "#/$defs/element" },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": { "const": "general" },
             "text": { "$ref": "#/$defs/text" }
           },
-          "required": ["type", "text"],
-          "unevaluatedProperties": false
+          "required": ["type", "text"]
         }
       ]
     },
 
-    "line_cue": {
-      "description": "Character cue line (e.g. JIM).",
+    "cue": {
+      "description": "Character cue element (e.g. JIM).",
       "allOf": [
-        { "$ref": "#/$defs/line" },
+        { "$ref": "#/$defs/element" },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": { "const": "character" },
             "character": { "$ref": "#/$defs/uuid" },
@@ -539,33 +529,33 @@
               "maxLength": 120
             }
           },
-          "required": ["type", "character"],
-          "unevaluatedProperties": false
+          "required": ["type", "character"]
         }
       ]
     },
 
-    "line_parenthetical": {
+    "parenthetical": {
       "allOf": [
-        { "$ref": "#/$defs/line" },
+        { "$ref": "#/$defs/element" },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": { "const": "parenthetical" },
             "text": { "$ref": "#/$defs/text" }
           },
-          "required": ["type", "text"],
-          "unevaluatedProperties": false
+          "required": ["type", "text"]
         }
       ]
     },
 
-    "line_dialogue": {
+    "dialogue": {
       "description": "Dialogue text for a character.",
       "allOf": [
-        { "$ref": "#/$defs/line" },
+        { "$ref": "#/$defs/element" },
         {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "type": { "const": "dialogue" },
             "character": { "$ref": "#/$defs/uuid" },
@@ -581,22 +571,8 @@
             },
             "text": { "$ref": "#/$defs/text" }
           },
-          "required": ["type", "character", "text"],
-          "unevaluatedProperties": false
+          "required": ["type", "character", "text"]
         }
-      ]
-    },
-
-    "screenplay_line": {
-      "description": "A discriminated union of screenplay lines.",
-      "oneOf": [
-        { "$ref": "#/$defs/line_action" },
-        { "$ref": "#/$defs/line_cue" },
-        { "$ref": "#/$defs/line_dialogue" },
-        { "$ref": "#/$defs/line_parenthetical" },
-        { "$ref": "#/$defs/line_general" },
-        { "$ref": "#/$defs/line_shot" },
-        { "$ref": "#/$defs/line_transition" }
       ]
     },
 
@@ -606,48 +582,37 @@
       "additionalProperties": false,
       "properties": {
         "id": { "$ref": "#/$defs/uuid" },
-
         "authors": {
           "type": "array",
           "items": { "$ref": "#/$defs/uuid" },
           "minItems": 1
         },
-
         "contributors": {
           "type": "array",
           "items": { "$ref": "#/$defs/uuid" },
           "default": []
         },
-
         "heading": { "$ref": "#/$defs/slugline" },
-
         "body": {
-          "description": "Ordered list of lines in the scene. Empty is allowed for outlining/drafting.",
+          "description": "Ordered list of elements in the scene. Empty is allowed for outlining and drafting.",
           "type": "array",
-          "items": { "$ref": "#/$defs/screenplay_line" },
+          "items": {
+            "oneOf": [
+              { "$ref": "#/$defs/action" },
+              { "$ref": "#/$defs/cue" },
+              { "$ref": "#/$defs/dialogue" },
+              { "$ref": "#/$defs/parenthetical" },
+              { "$ref": "#/$defs/general" },
+              { "$ref": "#/$defs/shot" },
+              { "$ref": "#/$defs/transition" }
+            ]
+          },
           "default": []
         },
-
         "cast": {
-          "description": "Character IDs present in the scene.",
+          "description": "Character ids present in the scene.",
           "type": "array",
           "items": { "$ref": "#/$defs/uuid" },
-          "uniqueItems": true,
-          "default": []
-        },
-
-        "beats": {
-          "description": "Story beats/plot points for structural search.",
-          "type": "array",
-          "items": { "$ref": "#/$defs/slug" },
-          "uniqueItems": true,
-          "default": []
-        },
-
-        "tone": {
-          "description": "Tonal markers (tense, comedic, romantic, etc.).",
-          "type": "array",
-          "items": { "$ref": "#/$defs/slug" },
           "uniqueItems": true,
           "default": []
         },
@@ -669,7 +634,7 @@
     },
 
     "ribbon": {
-      "description": "A repeating header/footer ribbon (optional).",
+      "description": "A repeating header or footer ribbon (optional).",
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -705,7 +670,7 @@
     },
 
     "license": {
-      "description": "License/copyright descriptor.",
+      "description": "License or copyright descriptor.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -717,67 +682,55 @@
     },
 
     "embedding": {
-      "description": "Vector embedding for semantic search. Stored separately so renderers can ignore/strip it.",
+      "description": "A derived numeric representation for semantic search. Optional and discardable.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "id": { "$ref": "#/$defs/uuid" },
-        "model": { "description": "Embedding model identifier.", "type": "string", "minLength": 1, "maxLength": 100 },
-        "dims": { "description": "Vector dimensionality.", "type": "integer", "minimum": 1, "maximum": 4096 },
-        "vector": { "description": "The embedding vector.", "type": "array", "items": { "type": "number" }, "minItems": 1, "maxItems": 4096 },
-        "src": { "description": "What was embedded.", "type": "string", "enum": ["name", "text", "desc", "heading", "composite"] },
+        "model": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "dimensions": { "type": "integer", "minimum": 1, "maximum": 4096 },
+        "values": { "type": "array", "items": { "type": "number" }, "minItems": 1, "maxItems": 4096 },
+        "source": { "type": "string", "enum": ["name", "text", "desc", "heading", "composite"] },
         "lang": { "$ref": "#/$defs/lang" },
-        "tokens": { "description": "Token count of the embedded source text.", "type": "integer", "minimum": 1 },
+        "tokens": { "type": "integer", "minimum": 1 },
         "created": { "$ref": "#/$defs/datetime" },
         "meta": { "$ref": "#/$defs/meta" }
       },
-      "required": ["id", "model", "dims", "vector", "src", "created"]
+      "required": ["id", "model", "dimensions", "values", "source", "created"]
     },
 
-    "chunk": {
-      "description": "A text chunk for RAG retrieval.",
+    "passage": {
+      "description": "A derived passage of text used for retrieval. Optional and discardable.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "id": { "$ref": "#/$defs/uuid" },
         "scene": { "$ref": "#/$defs/uuid" },
-        "lines": {
-          "description": "Line UUIDs included in this chunk.",
+        "elements": {
+          "description": "Element ids covered by this passage.",
           "type": "array",
           "items": { "$ref": "#/$defs/uuid" },
           "minItems": 1
         },
         "text": { "$ref": "#/$defs/text" },
-        "tokens": { "description": "Token count of chunk text.", "type": "integer", "minimum": 1 },
-        "overlap": { "description": "Tokens overlapping with adjacent chunks.", "type": "integer", "minimum": 0, "default": 0 },
-        "prev": { "description": "Previous chunk UUID (optional).", "anyOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }], "default": null },
-        "next": { "description": "Next chunk UUID (optional).", "anyOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }], "default": null },
+        "tokens": { "type": "integer", "minimum": 1 },
+        "overlap": { "type": "integer", "minimum": 0, "default": 0 },
         "meta": { "$ref": "#/$defs/meta" }
       },
-      "required": ["id", "scene", "lines", "text", "tokens"]
+      "required": ["id", "scene", "elements", "text", "tokens"]
     },
 
-    "synopsis": {
-      "description": "A hierarchical summary for RAG (document/act/sequence/scene).",
+    "summary": {
+      "description": "A derived summary. Optional and discardable.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "id": { "$ref": "#/$defs/uuid" },
-        "scope": { "type": "string", "enum": ["document", "act", "sequence", "scene"] },
-        "target": {
-          "description": "Target UUID (scene ID for scene scope; null for whole document).",
-          "anyOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }]
-        },
-        "range": {
-          "description": "For act/sequence summaries: [start_scene_idx, end_scene_idx].",
-          "type": "array",
-          "items": { "type": "integer", "minimum": 0 },
-          "minItems": 2,
-          "maxItems": 2
-        },
+        "scope": { "type": "string", "enum": ["document", "scene"] },
+        "target": { "anyOf": [{ "$ref": "#/$defs/uuid" }, { "type": "null" }] },
         "text": { "$ref": "#/$defs/text" },
-        "generated": { "description": "Whether this was LLM-generated.", "type": "boolean", "default": false },
-        "model": { "description": "Model used if generated.", "type": "string", "maxLength": 100 },
+        "generated": { "type": "boolean", "default": false },
+        "model": { "type": "string", "maxLength": 100 },
         "created": { "$ref": "#/$defs/datetime" },
         "meta": { "$ref": "#/$defs/meta" }
       },
@@ -893,7 +846,7 @@
     },
 
     "themes": {
-      "description": "Thematic tags for semantic filtering.",
+      "description": "Thematic tags for filtering.",
       "type": "array",
       "items": { "$ref": "#/$defs/slug" },
       "uniqueItems": true,
@@ -901,7 +854,7 @@
     },
 
     "logline": {
-      "description": "One-sentence summary for top-level retrieval.",
+      "description": "One-sentence summary.",
       "$ref": "#/$defs/text"
     },
 
@@ -917,14 +870,14 @@
           "properties": {
             "title": { "$ref": "#/$defs/name" },
             "authors": {
-              "description": "Author UUIDs shown on cover.",
+              "description": "Author uuids shown on cover.",
               "type": "array",
               "items": { "$ref": "#/$defs/uuid" },
               "minItems": 1,
               "uniqueItems": true
             },
             "sources": {
-              "description": "Source UUIDs shown on cover.",
+              "description": "Source uuids shown on cover.",
               "type": "array",
               "items": { "$ref": "#/$defs/uuid" },
               "uniqueItems": true,
@@ -944,41 +897,22 @@
             "header": { "$ref": "#/$defs/ribbon" },
             "footer": { "$ref": "#/$defs/ribbon" },
             "status": { "$ref": "#/$defs/status" },
-
             "styles": {
               "type": "array",
               "items": { "$ref": "#/$defs/style" },
               "default": []
             },
-
             "templates": {
               "type": "array",
               "items": { "$ref": "#/$defs/template" },
               "default": []
             },
-
             "guides": {
               "description": "Helpful links for renderers to follow established screenplay presentation conventions (informational only).",
               "type": "array",
-              "items": { "$ref": "#/$defs/guide" },
-              "default": [
-                {
-                  "id": "hollywood-standard",
-                  "title": "The Hollywood Standard: The Complete and Authoritative Guide to Script Format",
-                  "url": "https://www.amazon.com/Hollywood-Standard-Complete-Authoritative-Script/dp/1932907017",
-                  "note": "Christopher Riley. Common studio-facing reference; renderer guidance only.",
-                  "meta": {}
-                },
-                {
-                  "id": "final-draft-format",
-                  "title": "Final Draft - How to format a screenplay",
-                  "url": "https://www.finaldraft.com/learn/how-to-format-a-screenplay/",
-                  "note": "Renderer reference only; ScreenJSON remains layout-neutral where possible.",
-                  "meta": {}
-                }
-              ]
+              "items": { "$ref": "#/$defs/format" },
+              "default": []
             },
-
             "meta": { "$ref": "#/$defs/meta" }
           },
           "default": { "styles": [], "templates": [] }
@@ -1001,13 +935,13 @@
       "required": ["cover", "scenes"]
     },
 
-    "rag": {
-      "description": "RAG/LLM support data (optional; safe to omit entirely for clean exports/rendering).",
+    "analysis": {
+      "description": "Derived machine-readable representations. Optional and discardable.",
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "embeddings": {
-          "description": "Embeddings keyed by target object UUID (scene, line, character, etc.).",
+          "description": "Embeddings grouped by target id (keyed by uuid).",
           "type": "object",
           "patternProperties": {
             "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$": {
@@ -1019,35 +953,30 @@
           "additionalProperties": false,
           "default": {}
         },
-
-        "chunks": {
-          "description": "Pre-chunked text segments for retrieval.",
+        "passages": {
+          "description": "Derived passages for retrieval.",
           "type": "array",
-          "items": { "$ref": "#/$defs/chunk" },
+          "items": { "$ref": "#/$defs/passage" },
           "default": []
         },
-
-        "synopses": {
-          "description": "Hierarchical summaries (document/act/sequence/scene).",
+        "summaries": {
+          "description": "Derived summaries.",
           "type": "array",
-          "items": { "$ref": "#/$defs/synopsis" },
+          "items": { "$ref": "#/$defs/summary" },
           "default": []
         },
-
-        "config": {
-          "description": "Chunking/embedding configuration used to produce this rag section.",
+        "settings": {
+          "description": "How derived data was produced.",
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "chunk_size": { "type": "integer", "minimum": 1, "default": 512 },
-            "chunk_overlap": { "type": "integer", "minimum": 0, "default": 64 },
-            "embed_model": { "type": "string", "maxLength": 100 },
-            "embed_dims": { "type": "integer", "minimum": 1, "maximum": 4096 },
-            "tokenizer": { "type": "string", "maxLength": 50 },
+            "model": { "type": "string", "maxLength": 100 },
+            "size": { "type": "integer", "minimum": 1, "default": 512 },
+            "overlap": { "type": "integer", "minimum": 0, "default": 64 },
+            "tokeniser": { "type": "string", "maxLength": 50 },
             "meta": { "$ref": "#/$defs/meta" }
           }
         },
-
         "meta": { "$ref": "#/$defs/meta" }
       },
       "default": {}

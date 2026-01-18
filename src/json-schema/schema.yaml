@@ -81,9 +81,9 @@ additionalProperties: false
       "$ref": "#/$defs/slug"
     uniqueItems: true
     default: []
-  guide:
-    description: Reference to an external screenplay presentation guide (informational
-      for renderers).
+  format:
+    description: Reference to an external screenplay presentation standard for renderers
+      (informational only).
     type: object
     additionalProperties: false
     properties:
@@ -205,7 +205,8 @@ additionalProperties: false
       desc:
         "$ref": "#/$defs/text"
       traits:
-        description: Searchable attributes (protagonist, villain, comic-relief, etc.).
+        description: Optional descriptive tags for search and filtering (non-canonical,
+          editorial choice).
         type: array
         items:
           "$ref": "#/$defs/slug"
@@ -251,7 +252,7 @@ additionalProperties: false
     - label
     - created
   note:
-    description: An ancillary note attached to an object (typically a line).
+    description: An ancillary note attached to an object (typically an element).
     type: object
     additionalProperties: false
     properties:
@@ -393,7 +394,7 @@ additionalProperties: false
     - default
     - text
   bookmark:
-    description: A shortcut to a specific line within a scene (stable by IDs).
+    description: A shortcut to a specific element within a scene (stable by ids).
     type: object
     additionalProperties: false
     properties:
@@ -401,7 +402,7 @@ additionalProperties: false
         "$ref": "#/$defs/uuid"
       scene:
         "$ref": "#/$defs/uuid"
-      line:
+      element:
         "$ref": "#/$defs/uuid"
       title:
         "$ref": "#/$defs/text"
@@ -412,7 +413,7 @@ additionalProperties: false
     required:
     - id
     - scene
-    - line
+    - element
     - title
   slugline:
     description: Structured scene heading (slugline).
@@ -457,7 +458,7 @@ additionalProperties: false
           - AFTERNOON
           - EVENING
           - THE NEXT DAY
-        - pattern: "^[A-Z0-9][A-Z0-9 .''/-]{1,39}$"
+        - pattern: "^[A-Z0-9][A-Z0-9 .’'/-]{1,39}$"
       mods:
         description: Extra slugline modifiers (INTERCUT, FLASHBACK, ESTABLISHING,
           etc.).
@@ -476,8 +477,8 @@ additionalProperties: false
     - context
     - setting
     - time
-  line:
-    description: Common fields for all lines in a scene.
+  element:
+    description: Common fields for all elements within a scene body.
     type: object
     additionalProperties: false
     properties:
@@ -485,13 +486,6 @@ additionalProperties: false
         "$ref": "#/$defs/uuid"
       scene:
         "$ref": "#/$defs/uuid"
-      access:
-        "$ref": "#/$defs/roles"
-      notes:
-        type: array
-        items:
-          "$ref": "#/$defs/note"
-        default: []
       authors:
         type: array
         items:
@@ -501,6 +495,13 @@ additionalProperties: false
         type: array
         items:
           "$ref": "#/$defs/uuid"
+        default: []
+      access:
+        "$ref": "#/$defs/roles"
+      notes:
+        type: array
+        items:
+          "$ref": "#/$defs/note"
         default: []
       charset:
         "$ref": "#/$defs/charset"
@@ -536,10 +537,11 @@ additionalProperties: false
     required:
     - id
     - authors
-  line_action:
+  action:
     allOf:
-    - "$ref": "#/$defs/line"
+    - "$ref": "#/$defs/element"
     - type: object
+      additionalProperties: false
       properties:
         type:
           const: action
@@ -548,11 +550,11 @@ additionalProperties: false
       required:
       - type
       - text
-      unevaluatedProperties: false
-  line_shot:
+  shot:
     allOf:
-    - "$ref": "#/$defs/line"
+    - "$ref": "#/$defs/element"
     - type: object
+      additionalProperties: false
       properties:
         type:
           const: shot
@@ -572,11 +574,11 @@ additionalProperties: false
       required:
       - type
       - text
-      unevaluatedProperties: false
-  line_transition:
+  transition:
     allOf:
-    - "$ref": "#/$defs/line"
+    - "$ref": "#/$defs/element"
     - type: object
+      additionalProperties: false
       properties:
         type:
           const: transition
@@ -585,11 +587,11 @@ additionalProperties: false
       required:
       - type
       - text
-      unevaluatedProperties: false
-  line_general:
+  general:
     allOf:
-    - "$ref": "#/$defs/line"
+    - "$ref": "#/$defs/element"
     - type: object
+      additionalProperties: false
       properties:
         type:
           const: general
@@ -598,12 +600,12 @@ additionalProperties: false
       required:
       - type
       - text
-      unevaluatedProperties: false
-  line_cue:
-    description: Character cue line (e.g. JIM).
+  cue:
+    description: Character cue element (e.g. JIM).
     allOf:
-    - "$ref": "#/$defs/line"
+    - "$ref": "#/$defs/element"
     - type: object
+      additionalProperties: false
       properties:
         type:
           const: character
@@ -617,11 +619,11 @@ additionalProperties: false
       required:
       - type
       - character
-      unevaluatedProperties: false
-  line_parenthetical:
+  parenthetical:
     allOf:
-    - "$ref": "#/$defs/line"
+    - "$ref": "#/$defs/element"
     - type: object
+      additionalProperties: false
       properties:
         type:
           const: parenthetical
@@ -630,12 +632,12 @@ additionalProperties: false
       required:
       - type
       - text
-      unevaluatedProperties: false
-  line_dialogue:
+  dialogue:
     description: Dialogue text for a character.
     allOf:
-    - "$ref": "#/$defs/line"
+    - "$ref": "#/$defs/element"
     - type: object
+      additionalProperties: false
       properties:
         type:
           const: dialogue
@@ -662,17 +664,6 @@ additionalProperties: false
       - type
       - character
       - text
-      unevaluatedProperties: false
-  screenplay_line:
-    description: A discriminated union of screenplay lines.
-    oneOf:
-    - "$ref": "#/$defs/line_action"
-    - "$ref": "#/$defs/line_cue"
-    - "$ref": "#/$defs/line_dialogue"
-    - "$ref": "#/$defs/line_parenthetical"
-    - "$ref": "#/$defs/line_general"
-    - "$ref": "#/$defs/line_shot"
-    - "$ref": "#/$defs/line_transition"
   scene:
     description: A screenplay scene.
     type: object
@@ -693,30 +684,24 @@ additionalProperties: false
       heading:
         "$ref": "#/$defs/slugline"
       body:
-        description: Ordered list of lines in the scene. Empty is allowed for outlining/drafting.
+        description: Ordered list of elements in the scene. Empty is allowed for outlining
+          and drafting.
         type: array
         items:
-          "$ref": "#/$defs/screenplay_line"
+          oneOf:
+          - "$ref": "#/$defs/action"
+          - "$ref": "#/$defs/cue"
+          - "$ref": "#/$defs/dialogue"
+          - "$ref": "#/$defs/parenthetical"
+          - "$ref": "#/$defs/general"
+          - "$ref": "#/$defs/shot"
+          - "$ref": "#/$defs/transition"
         default: []
       cast:
-        description: Character IDs present in the scene.
+        description: Character ids present in the scene.
         type: array
         items:
           "$ref": "#/$defs/uuid"
-        uniqueItems: true
-        default: []
-      beats:
-        description: Story beats/plot points for structural search.
-        type: array
-        items:
-          "$ref": "#/$defs/slug"
-        uniqueItems: true
-        default: []
-      tone:
-        description: Tonal markers (tense, comedic, romantic, etc.).
-        type: array
-        items:
-          "$ref": "#/$defs/slug"
         uniqueItems: true
         default: []
       animals:
@@ -747,7 +732,7 @@ additionalProperties: false
     - heading
     - body
   ribbon:
-    description: A repeating header/footer ribbon (optional).
+    description: A repeating header or footer ribbon (optional).
     type: object
     additionalProperties: false
     properties:
@@ -806,7 +791,7 @@ additionalProperties: false
     - round
     - updated
   license:
-    description: License/copyright descriptor.
+    description: License or copyright descriptor.
     type: object
     additionalProperties: false
     properties:
@@ -822,32 +807,28 @@ additionalProperties: false
     required:
     - id
   embedding:
-    description: Vector embedding for semantic search. Stored separately so renderers
-      can ignore/strip it.
+    description: A derived numeric representation for semantic search. Optional and
+      discardable.
     type: object
     additionalProperties: false
     properties:
       id:
         "$ref": "#/$defs/uuid"
       model:
-        description: Embedding model identifier.
         type: string
         minLength: 1
         maxLength: 100
-      dims:
-        description: Vector dimensionality.
+      dimensions:
         type: integer
         minimum: 1
         maximum: 4096
-      vector:
-        description: The embedding vector.
+      values:
         type: array
         items:
           type: number
         minItems: 1
         maxItems: 4096
-      src:
-        description: What was embedded.
+      source:
         type: string
         enum:
         - name
@@ -858,7 +839,6 @@ additionalProperties: false
       lang:
         "$ref": "#/$defs/lang"
       tokens:
-        description: Token count of the embedded source text.
         type: integer
         minimum: 1
       created:
@@ -868,12 +848,12 @@ additionalProperties: false
     required:
     - id
     - model
-    - dims
-    - vector
-    - src
+    - dimensions
+    - values
+    - source
     - created
-  chunk:
-    description: A text chunk for RAG retrieval.
+  passage:
+    description: A derived passage of text used for retrieval. Optional and discardable.
     type: object
     additionalProperties: false
     properties:
@@ -881,8 +861,8 @@ additionalProperties: false
         "$ref": "#/$defs/uuid"
       scene:
         "$ref": "#/$defs/uuid"
-      lines:
-        description: Line UUIDs included in this chunk.
+      elements:
+        description: Element ids covered by this passage.
         type: array
         items:
           "$ref": "#/$defs/uuid"
@@ -890,36 +870,22 @@ additionalProperties: false
       text:
         "$ref": "#/$defs/text"
       tokens:
-        description: Token count of chunk text.
         type: integer
         minimum: 1
       overlap:
-        description: Tokens overlapping with adjacent chunks.
         type: integer
         minimum: 0
         default: 0
-      prev:
-        description: Previous chunk UUID (optional).
-        anyOf:
-        - "$ref": "#/$defs/uuid"
-        - type: 'null'
-        default: 
-      next:
-        description: Next chunk UUID (optional).
-        anyOf:
-        - "$ref": "#/$defs/uuid"
-        - type: 'null'
-        default: 
       meta:
         "$ref": "#/$defs/meta"
     required:
     - id
     - scene
-    - lines
+    - elements
     - text
     - tokens
-  synopsis:
-    description: A hierarchical summary for RAG (document/act/sequence/scene).
+  summary:
+    description: A derived summary. Optional and discardable.
     type: object
     additionalProperties: false
     properties:
@@ -929,30 +895,17 @@ additionalProperties: false
         type: string
         enum:
         - document
-        - act
-        - sequence
         - scene
       target:
-        description: Target UUID (scene ID for scene scope; null for whole document).
         anyOf:
         - "$ref": "#/$defs/uuid"
         - type: 'null'
-      range:
-        description: 'For act/sequence summaries: [start_scene_idx, end_scene_idx].'
-        type: array
-        items:
-          type: integer
-          minimum: 0
-        minItems: 2
-        maxItems: 2
       text:
         "$ref": "#/$defs/text"
       generated:
-        description: Whether this was LLM-generated.
         type: boolean
         default: false
       model:
-        description: Model used if generated.
         type: string
         maxLength: 100
       created:
@@ -1067,14 +1020,14 @@ properties:
     uniqueItems: true
     default: []
   themes:
-    description: Thematic tags for semantic filtering.
+    description: Thematic tags for filtering.
     type: array
     items:
       "$ref": "#/$defs/slug"
     uniqueItems: true
     default: []
   logline:
-    description: One-sentence summary for top-level retrieval.
+    description: One-sentence summary.
     "$ref": "#/$defs/text"
   document:
     description: The screenplay document container.
@@ -1089,14 +1042,14 @@ properties:
           title:
             "$ref": "#/$defs/name"
           authors:
-            description: Author UUIDs shown on cover.
+            description: Author uuids shown on cover.
             type: array
             items:
               "$ref": "#/$defs/uuid"
             minItems: 1
             uniqueItems: true
           sources:
-            description: Source UUIDs shown on cover.
+            description: Source uuids shown on cover.
             type: array
             items:
               "$ref": "#/$defs/uuid"
@@ -1135,21 +1088,8 @@ properties:
               presentation conventions (informational only).
             type: array
             items:
-              "$ref": "#/$defs/guide"
-            default:
-            - id: hollywood-standard
-              title: 'The Hollywood Standard: The Complete and Authoritative Guide
-                to Script Format'
-              url: https://www.amazon.com/Hollywood-Standard-Complete-Authoritative-Script/dp/1932907017
-              note: Christopher Riley. Common studio-facing reference; renderer guidance
-                only.
-              meta: {}
-            - id: final-draft-format
-              title: Final Draft - How to format a screenplay
-              url: https://www.finaldraft.com/learn/how-to-format-a-screenplay/
-              note: Renderer reference only; ScreenJSON remains layout-neutral where
-                possible.
-              meta: {}
+              "$ref": "#/$defs/format"
+            default: []
           meta:
             "$ref": "#/$defs/meta"
         default:
@@ -1170,14 +1110,13 @@ properties:
     required:
     - cover
     - scenes
-  rag:
-    description: RAG/LLM support data (optional; safe to omit entirely for clean exports/rendering).
+  analysis:
+    description: Derived machine-readable representations. Optional and discardable.
     type: object
     additionalProperties: false
     properties:
       embeddings:
-        description: Embeddings keyed by target object UUID (scene, line, character,
-          etc.).
+        description: Embeddings grouped by target id (keyed by uuid).
         type: object
         patternProperties:
           "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$":
@@ -1187,39 +1126,35 @@ properties:
             minItems: 1
         additionalProperties: false
         default: {}
-      chunks:
-        description: Pre-chunked text segments for retrieval.
+      passages:
+        description: Derived passages for retrieval.
         type: array
         items:
-          "$ref": "#/$defs/chunk"
+          "$ref": "#/$defs/passage"
         default: []
-      synopses:
-        description: Hierarchical summaries (document/act/sequence/scene).
+      summaries:
+        description: Derived summaries.
         type: array
         items:
-          "$ref": "#/$defs/synopsis"
+          "$ref": "#/$defs/summary"
         default: []
-      config:
-        description: Chunking/embedding configuration used to produce this rag section.
+      settings:
+        description: How derived data was produced.
         type: object
         additionalProperties: false
         properties:
-          chunk_size:
+          model:
+            type: string
+            maxLength: 100
+          size:
             type: integer
             minimum: 1
             default: 512
-          chunk_overlap:
+          overlap:
             type: integer
             minimum: 0
             default: 64
-          embed_model:
-            type: string
-            maxLength: 100
-          embed_dims:
-            type: integer
-            minimum: 1
-            maximum: 4096
-          tokenizer:
+          tokeniser:
             type: string
             maxLength: 50
           meta:
