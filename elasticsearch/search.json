@@ -1,0 +1,178 @@
+{
+  "settings": {
+    "analysis": {
+      "char_filter": {
+        "remove_line_breaks": {
+          "type": "pattern_replace",
+          "pattern": "\\r\\n|\\r|\\n",
+          "replacement": " "
+        }
+      },
+      "filter": {
+        "english_stop": {
+          "type": "stop",
+          "stopwords": "_english_"
+        },
+        "english_possessive_stemmer": {
+          "type": "stemmer",
+          "language": "possessive_english"
+        },
+        "english_stemmer": {
+          "type": "stemmer",
+          "language": "english"
+        },
+        "synonym_filter": {
+          "type": "synonym",
+          "lenient": true,
+          "synonyms": [
+            "homicide, murder"
+          ]
+        },
+        "edge_ngram_filter": {
+          "type": "edge_ngram",
+          "min_gram": 3,
+          "max_gram": 20
+        }
+      },
+      "analyzer": {
+        "screenjson_search": {
+          "type": "custom",
+          "char_filter": ["remove_line_breaks"],
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "asciifolding",
+            "english_stop",
+            "english_possessive_stemmer",
+            "english_stemmer",
+            "synonym_filter"
+          ]
+        },
+        "screenjson_index": {
+          "type": "custom",
+          "char_filter": ["remove_line_breaks"],
+          "tokenizer": "standard",
+          "filter": [
+            "lowercase",
+            "asciifolding",
+            "english_stop",
+            "english_possessive_stemmer",
+            "english_stemmer",
+            "synonym_filter",
+            "edge_ngram_filter"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "id": { "type": "keyword" },
+      "spec_version": { "type": "keyword" },
+
+      "title": {
+        "properties": {
+          "en": {
+            "type": "text",
+            "analyzer": "screenjson_index",
+            "search_analyzer": "screenjson_search",
+            "fields": {
+              "raw": { "type": "keyword", "ignore_above": 256 }
+            }
+          }
+        }
+      },
+
+      "authors": {
+        "type": "nested",
+        "properties": {
+          "id": { "type": "keyword" },
+          "given": { "type": "keyword" },
+          "family": { "type": "keyword" }
+        }
+      },
+
+      "characters": {
+        "type": "nested",
+        "properties": {
+          "id": { "type": "keyword" },
+          "slug": { "type": "keyword" },
+          "name": {
+            "type": "text",
+            "analyzer": "screenjson_index",
+            "search_analyzer": "screenjson_search",
+            "fields": {
+              "raw": { "type": "keyword", "ignore_above": 256 }
+            }
+          },
+          "aliases": {
+            "type": "text",
+            "analyzer": "screenjson_index",
+            "search_analyzer": "screenjson_search"
+          }
+        }
+      },
+
+      "taggable": { "type": "keyword" },
+
+      "document": {
+        "properties": {
+          "scene_count": { "type": "integer" },
+
+          "scenes": {
+            "type": "nested",
+            "properties": {
+              "id": { "type": "keyword" },
+
+              "heading": {
+                "properties": {
+                  "context": { "type": "keyword" },
+                  "setting": {
+                    "type": "text",
+                    "analyzer": "screenjson_index",
+                    "search_analyzer": "screenjson_search",
+                    "fields": {
+                      "raw": { "type": "keyword", "ignore_above": 256 }
+                    }
+                  },
+                  "sequence": { "type": "keyword" },
+                  "modifiers": { "type": "keyword" }
+                }
+              },
+
+              "cast": { "type": "keyword" },
+              "tags": { "type": "keyword" },
+
+              "body": {
+                "type": "nested",
+                "properties": {
+                  "id": { "type": "keyword" },
+                  "type": { "type": "keyword" },
+                  "character_id": { "type": "keyword" },
+
+                  "content_text": {
+                    "description": "Denormalized: chosen language text (or concatenated all langs) for indexing.",
+                    "type": "text",
+                    "analyzer": "screenjson_index",
+                    "search_analyzer": "screenjson_search"
+                  },
+
+                  "omitted": { "type": "boolean" },
+                  "locked": { "type": "boolean" }
+                }
+              }
+            }
+          },
+
+          "text_search": {
+            "description": "Denormalized whole-script text for fast simple querying.",
+            "type": "text",
+            "analyzer": "screenjson_index",
+            "search_analyzer": "screenjson_search"
+          }
+        }
+      }
+    }
+  }
+}
