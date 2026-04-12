@@ -421,9 +421,10 @@ additionalProperties: false
     additionalProperties: false
     properties:
       'no':
-        description: Production scene number (optional).
-        type: integer
-        minimum: 1
+        description: Production scene number - a label (optional).
+        type: string
+        minLength: 1
+        maxLength: 10
       context:
         description: INT/EXT style context.
         type: string
@@ -486,6 +487,12 @@ additionalProperties: false
         "$ref": "#/$defs/uuid"
       scene:
         "$ref": "#/$defs/uuid"
+      sceneNo:
+        description: Optional explicit scene number from source format (e.g., '1A', 'I-1-A').
+        type: string
+        pattern: "^[a-zA-Z0-9.\\-]+$"
+        minLength: 1
+        maxLength: 20
       authors:
         type: array
         items:
