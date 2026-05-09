@@ -7,7 +7,7 @@ description: "Workspace instructions for screenjson-schema: The canonical JSON S
 
 ## Project Overview
 
-**screenjson-schema** is the authoritative JSON Schema (Draft 2026-01) specification for the ScreenJSON format. It defines:
+**screenjson-schema** is the authoritative JSON Schema (Draft 2026-04) specification with Animation extensions for the ScreenJSON format. It defines:
 - Complete screenplay document structure
 - All element types and relationships
 - Data validation rules and constraints
@@ -23,7 +23,7 @@ screenjson-schema/
 ├── README.md
 ├── src/
 │   └── json-schema/
-│       ├── schema.json      # Canonical JSON Schema (Draft 2026-01)
+│       ├── schema.json      # Canonical JSON Schema (Draft 2026-04)
 │       └── schema.yaml      # Human-editable YAML equivalent
 │
 └── elasticsearch/           # Integration examples
@@ -222,7 +222,7 @@ The `elasticsearch/` folder contains integration examples:
 ### Schema Authoring
 | Aspect | Convention |
 |--------|-----------|
-| **Format** | JSON Schema Draft 2026-01 (primary); YAML for human editing |
+| **Format** | JSON Schema Draft 2026-04 (primary); YAML for human editing |
 | **Reusable types** | Define in `$defs`, reference with `$ref` |
 | **Required fields** | Explicit `required` array at object level |
 | **Validation pattern** | Use `pattern` for string formats (regex) |
@@ -288,7 +288,7 @@ Valid codes: `white`, `blue`, `pink`, `yellow`, `green`, `goldenrod`, `orange`, 
 ## Links & Resources
 
 - [ScreenJSON Specification](https://screenjson.com)
-- [JSON Schema Draft 2026-01](https://json-schema.org/draft/2026-01/json-schema-core.html)
+- [JSON Schema Draft 2026-04](https://json-schema.org/draft/2026-04/json-schema-core.html)
 - [BCP 47 Language Tags](https://tools.ietf.org/html/bcp47)
 - [Elasticsearch Documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 - [screenjson-cli](../screenjson-cli/) — Reference implementation using this schema

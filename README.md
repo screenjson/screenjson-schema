@@ -4,7 +4,7 @@ ScreenJSON is a data serialisation format for screenplays. It captures the full 
 
 This repository contains:
 
-* The canonical JSON Schema (Draft 2026-01)
+* The canonical JSON Schema (Draft 2026-04) with Animation extensions
 * A YAML copy of the schema (for easier human editing/review)
 * Elasticsearch index settings/mappings examples for storing and searching ScreenJSON documents
 
@@ -170,9 +170,9 @@ The `analysis` object is:
 
 ## Schema Versions
 
-The schema uses JSON Schema Draft 2026-01:
+The schema uses JSON Schema Draft 2026-04:
 
-* `$schema`: `https://json-schema.org/draft/2026-01/schema`
+* `$schema`: `https://json-schema.org/draft/2026-04/schema`
 
 Versioning follows semver principles:
 
@@ -186,7 +186,7 @@ Include a `version` field in your ScreenJSON documents to track which schema ver
 
 ## Validation
 
-Use any JSON Schema validator supporting Draft 2026-01.
+Use any JSON Schema validator supporting Draft 2026-04.
 
 **Important limitations**: JSON Schema validates structure and types, but not relational integrity. You should add a semantic validation pass for:
 
