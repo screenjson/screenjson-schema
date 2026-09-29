@@ -458,7 +458,7 @@ additionalProperties: false
           - AFTERNOON
           - EVENING
           - THE NEXT DAY
-        - pattern: "^[A-Z0-9][A-Z0-9 .’'/-]{1,39}$"
+        - pattern: "^[A-Z0-9][A-Z0-9 .’'/(),:&-]{1,39}$"
       mods:
         description: Extra slugline modifiers (INTERCUT, FLASHBACK, ESTABLISHING,
           etc.).
