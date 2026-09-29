@@ -407,7 +407,6 @@
     "element": {
       "description": "Common fields for all elements within a scene body.",
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "id": { "$ref": "#/$defs/uuid" },
         "scene": { "$ref": "#/$defs/uuid" },
@@ -451,11 +450,11 @@
     },
 
     "action": {
+      "unevaluatedProperties": false,
       "allOf": [
         { "$ref": "#/$defs/element" },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": { "const": "action" },
             "text": { "$ref": "#/$defs/text" }
@@ -466,11 +465,11 @@
     },
 
     "shot": {
+      "unevaluatedProperties": false,
       "allOf": [
         { "$ref": "#/$defs/element" },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": { "const": "shot" },
             "text": { "$ref": "#/$defs/text" },
@@ -483,11 +482,11 @@
     },
 
     "transition": {
+      "unevaluatedProperties": false,
       "allOf": [
         { "$ref": "#/$defs/element" },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": { "const": "transition" },
             "text": { "$ref": "#/$defs/text" }
@@ -498,11 +497,11 @@
     },
 
     "general": {
+      "unevaluatedProperties": false,
       "allOf": [
         { "$ref": "#/$defs/element" },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": { "const": "general" },
             "text": { "$ref": "#/$defs/text" }
@@ -513,12 +512,12 @@
     },
 
     "cue": {
+      "unevaluatedProperties": false,
       "description": "Character cue element (e.g. JIM).",
       "allOf": [
         { "$ref": "#/$defs/element" },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": { "const": "character" },
             "character": { "$ref": "#/$defs/uuid" },
@@ -535,11 +534,11 @@
     },
 
     "parenthetical": {
+      "unevaluatedProperties": false,
       "allOf": [
         { "$ref": "#/$defs/element" },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": { "const": "parenthetical" },
             "text": { "$ref": "#/$defs/text" }
@@ -550,12 +549,12 @@
     },
 
     "dialogue": {
+      "unevaluatedProperties": false,
       "description": "Dialogue text for a character.",
       "allOf": [
         { "$ref": "#/$defs/element" },
         {
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "type": { "const": "dialogue" },
             "character": { "$ref": "#/$defs/uuid" },

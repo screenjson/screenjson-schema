@@ -480,7 +480,6 @@ additionalProperties: false
   element:
     description: Common fields for all elements within a scene body.
     type: object
-    additionalProperties: false
     properties:
       id:
         "$ref": "#/$defs/uuid"
@@ -538,10 +537,10 @@ additionalProperties: false
     - id
     - authors
   action:
+    unevaluatedProperties: false
     allOf:
     - "$ref": "#/$defs/element"
     - type: object
-      additionalProperties: false
       properties:
         type:
           const: action
@@ -551,10 +550,10 @@ additionalProperties: false
       - type
       - text
   shot:
+    unevaluatedProperties: false
     allOf:
     - "$ref": "#/$defs/element"
     - type: object
-      additionalProperties: false
       properties:
         type:
           const: shot
@@ -575,10 +574,10 @@ additionalProperties: false
       - type
       - text
   transition:
+    unevaluatedProperties: false
     allOf:
     - "$ref": "#/$defs/element"
     - type: object
-      additionalProperties: false
       properties:
         type:
           const: transition
@@ -588,10 +587,10 @@ additionalProperties: false
       - type
       - text
   general:
+    unevaluatedProperties: false
     allOf:
     - "$ref": "#/$defs/element"
     - type: object
-      additionalProperties: false
       properties:
         type:
           const: general
@@ -601,11 +600,11 @@ additionalProperties: false
       - type
       - text
   cue:
+    unevaluatedProperties: false
     description: Character cue element (e.g. JIM).
     allOf:
     - "$ref": "#/$defs/element"
     - type: object
-      additionalProperties: false
       properties:
         type:
           const: character
@@ -620,10 +619,10 @@ additionalProperties: false
       - type
       - character
   parenthetical:
+    unevaluatedProperties: false
     allOf:
     - "$ref": "#/$defs/element"
     - type: object
-      additionalProperties: false
       properties:
         type:
           const: parenthetical
@@ -633,11 +632,11 @@ additionalProperties: false
       - type
       - text
   dialogue:
+    unevaluatedProperties: false
     description: Dialogue text for a character.
     allOf:
     - "$ref": "#/$defs/element"
     - type: object
-      additionalProperties: false
       properties:
         type:
           const: dialogue
